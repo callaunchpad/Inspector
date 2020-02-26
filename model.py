@@ -9,6 +9,8 @@ from tensorflow.keras.preprocessing import sequence
 from tensorflow.keras.layers import Bidirectional
 import numpy as np
 
+# LSTM format for sentiment analysis on movie reviews
+
 # for saving the model
 checkpoint_path = "training_1/cp.ckpt"
 checkpoint_dir = os.path.dirname(checkpoint_path)

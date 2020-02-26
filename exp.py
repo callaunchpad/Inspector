@@ -1,5 +1,5 @@
 import tensorflow as tf
-
+Dataset.test()
 dims, layers = 32, 2
 # Creating the forward and backwards cells
 lstm_fw_cell = tf.nn.rnn_cell.BasicLSTMCell(dims, forget_bias=1.0)
