@@ -1,0 +1,36 @@
+Virtual environments are a way to manage python packages for separate projects.
+They allow you to avoid installing Python packages globally (where you just do pip install ___ in the command line)
+which could sometimes break other projects, especially if they use different version of a library. Basically
+it's just supposed to help you avoid all the gross installation and import errors that you can sometimes get with pip and Python.
+
+The virtual environment starts off with a clean slate–you have to install packages while inside the virtual environment
+to use such packages in the virtual environment. 
+
+Link to installation guide for Python's virtual environment manager Venv:
+https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/
+
+Create virtual environment directory: 
+    python3 -m venv env (MacOS and Linux)
+    py -m venv env (Windows)
+        * Run this in the directory you wanna make the env in. Creates a new folder called "env"
+
+Activate the virtual environment:
+    source env/bin/activate (MacOS and Linux)
+    pypy -m venv env (Windows)
+        * Again make sure you're in the same directory as the "env" folder
+        * You should see the text "(env)" to the left of your command line now
+        * Everytime you run a python script or the interpreter, it'll only recognize
+            the packages you installed in the virtual environment. Try running the python
+            interpreter and importing numpy for example. It shoudn't be recognized initially.
+        * Try to remember to run this command every time you're working on the project, 
+            especially if you wanna install something for the project.
+
+Leave the virtual environment:
+    deactivate (MacOS, Linux, and Windows)
+        * Leaves the virtual environment. The "(env)" text in the command line should be gone now
+        * Everything is back to normal now. Python will now recognize all the global packages you've installed.
+        * Note: python won't be able to recognize any of the packages you installed in the virtual env,
+            unless of course you also installed in globally.
+
+List all modules installed w/pip
+    pip list
