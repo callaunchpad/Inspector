@@ -1,5 +1,5 @@
 SSH into the High Performance Clusters
-ssh my_ocf_username@hpcctl.ocf.berkeley.edu
+ssh <OCF_Username>@hpcctl.ocf.berkeley.edu
 
 
 check out how to submit jobs here: https://www.ocf.berkeley.edu/docs/services/hpc/slurm/
@@ -10,15 +10,14 @@ keep your terminal window open the whole time.
 submit a job:
 sbatch <shell_script>
 
-Inside the shell script, add a format like this:
-#!/bin/bash
- #SBATCH --ntasks=1
+Inside the shell script, add something like this:
+#!/bin/bash <--- this always goes at the top of every bash script
+ #SBATCH --ntasks=1 <--- specify OCF compute settings in comments at the top with #SBATCH to start
  #SBATCH --cpus-per-task=4
  #SBATCH --mem=8G
  #SBATCH --gres=gpu:1
 
- python <python_script.py>
- echo "Hello world!"
+ python <python_script.py> <---- this should be the command that runs the python script you wanna run
 
 The output of the slurm job will be put in a file with this name format in the dir you ran sbatch from:
 slurm-[your job's numeric ID].out
