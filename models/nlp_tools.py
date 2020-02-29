@@ -19,7 +19,7 @@ tokenizer = RegexpTokenizer(r'\w+')
 # is a vector of size 50 for now
 def make_embeddings_dict(glove_path):
     embeddings_dict = {}
-    with open(glove_path, 'r') as f:
+    with open(glove_path, 'r', encoding='utf8') as f:
         for line in f:
             values = line.split()
             word = values[0]
