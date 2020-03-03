@@ -3,8 +3,9 @@ from csv import DictReader
 from os import path
 import sys
 import nlp_tools
+import ctypes
 
-csv.field_size_limit(sys.maxsize)
+csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
 # Dataset class for the CNN data
 class Dataset():
     def __init__(self, filename="all_data.csv", path='../CNN_data'):
