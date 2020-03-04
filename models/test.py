@@ -4,18 +4,22 @@ from tensorflow import keras
 
 from loader import load_data
 
-from keras.optimizers import SGD
-from keras.losses import BinaryCrossentropy
-from keras import layers
-from keras.models import Model
+from tensorflow.keras.optimizers import SGD
+from tensorflow.keras.losses import BinaryCrossentropy
+from tensorflow.keras import layers
+from tensorflow.keras.models import Model
 
+print("loading data...\n")
 train_title, test_title, train_labels, train_body, test_body, test_labels = load_data()
-
+print("loaded data!")
 
 ### TRAINING ###
 
 ### TITLE BRANCH ###
 
+embedding_size = 50
+
+# should be individual input sizes, not total number of inputs
 title_size = len(train_title)
 
 title_inputs = layers.Input(shape=(title_size, ), name='title')
@@ -27,6 +31,7 @@ title_outputs = layers.Dense(6, activation='relu')(x)
 
 ### TEXT BRANCH ###
 
+# should be individual input sizes, not total number of inputs
 body_size = len(train_body)
 
 body_inputs = layers.Input(shape=(body_size, ), name='body')
@@ -54,6 +59,7 @@ model.compile(loss=BinaryCrossentropy(),
               optimizer=SGD(),
               metrics=['accuracy'])
 
+print("begin training... \n")
 history = model.fit({'title': train_title, 'body': train_body},
                     {'output': train_labels},
                     batch_size=32,

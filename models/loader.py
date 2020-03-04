@@ -1,41 +1,28 @@
-from nlp_tools import make_embeddings_dict, save_file, load_file, remove_punc, remove_stopwords, lemmatize
+from nlp_tools import save_file, load_file
 from dataset import Dataset
 from os import path
+import numpy as np
 
-THIS_FOLDER = path.dirname(path.abspath(__file__))
-
-glove_dir = path.join(THIS_FOLDER, 'glove.6B')
-
-glove_50d = path.join(glove_dir, 'glove.6B.50d.txt')
-glove_100d = path.join(glove_dir, 'glove.6B.100d.txt')
-glove_200d = path.join(glove_dir, 'glove.6B.200d.txt')
-glove_300d = path.join(glove_dir, 'glove.6B.300d.txt')
+empty_array = np.array([0]*50)
 
 emb_file = 'emb_dict.pkl'
-# save_file(emb_file, make_embeddings_dict(glove_50d))
-emb_dict = load_file(emb_file)
-dset = Dataset(filename='all_data.csv', path=path.join(path.dirname(path.dirname(path.abspath(__file__))), 'CNN_data'))
-
-ex = dset.bodies[0]
-ex = remove_punc(ex)
-ex = remove_stopwords(ex)
-ex = lemmatize(ex)
-print(ex)
-
-empty_array = [0]*50
+dset_file = 'dataset_obj.pkl'
 
 def load_data():
-    dset = Dataset()
+    emb_dict = load_file(emb_file)
+    dset = load_file(dset_file)
     all_title_embeddings = []
     for title in dset.titles:
 
         title_embeddings = []
         for word in title:
             # word = word.lower()
-            print(word)
-            if not emb_dict.get(word) is None:
+            #print(word)
+            # if the word is OOV, append the unk vector
+            if emb_dict.get(word) is None:
                 title_embeddings.append(emb_dict.get('unk')) # POTENTIALLY CHANGE WHAT TO APPEND
-            title_embeddings.append(emb_dict.get(word))
+            else:
+                title_embeddings.append(emb_dict.get(word))
         
         if len(title_embeddings) > 13:
             title_embeddings = title_embeddings[:13]
@@ -49,8 +36,12 @@ def load_data():
     for body in dset.bodies:
         body_embeddings = []
         for word in body:
-            body_embeddings.append(emb_dict[word])
-        
+            # if the word is OOV, append the unk vector
+            if emb_dict.get(word) is None:
+                body_embeddings.append(emb_dict.get('unk')) # POTENTIALLY CHANGE WHAT TO APPEND
+            else:
+                body_embeddings.append(emb_dict[word])
+
         if len(body_embeddings) > 500:
             body_embeddings = body_embeddings[:500]
         elif len(body_embeddings) < 500:
@@ -59,11 +50,11 @@ def load_data():
 
         all_body_embeddings.append(body_embeddings)
 
-    train_title = all_title_embeddings[:int(len(all_title_embeddings) * 0.75)]
-    test_title = all_title_embeddings[int(len(all_title_embeddings) * 0.75):]
-    train_body = all_body_embeddings[:int(len(all_body_embeddings) * 0.75)]
-    test_body = all_body_embeddings[int(len(all_body_embeddings) * 0.75):]
-    train_labels = dset.labels[:int(len(all_body_embeddings) * 0.75)]
-    test_labels = dset.labels[int(len(all_body_embeddings) * 0.75):]
+    train_title = np.array(all_title_embeddings[:int(len(all_title_embeddings) * 0.75)])
+    test_title = np.array(all_title_embeddings[int(len(all_title_embeddings) * 0.75):])
+    train_body = np.array(all_body_embeddings[:int(len(all_body_embeddings) * 0.75)])
+    test_body = np.array(all_body_embeddings[int(len(all_body_embeddings) * 0.75):])
+    train_labels = np.array(dset.labels[:int(len(all_body_embeddings) * 0.75)])
+    test_labels = np.array(dset.labels[int(len(all_body_embeddings) * 0.75):])
 
     return train_title, test_title, train_labels, train_body, test_body, test_labels
