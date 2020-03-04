@@ -29,9 +29,9 @@ class Dataset():
             #     print("title: ", row['text'])
             for line in reader:
                 ids.append(line['uuid'])
-                titles.append(line['title'])
-                bodies.append(line['text'])
-                labels.append(line['type'])
+                titles.append(line['title'].split(' '))
+                bodies.append(line['text'].split(' '))
+                labels.append(1 if line['type'] == 'real' else 0)
         return ids, titles, bodies, labels
     def test():
         print("hello")

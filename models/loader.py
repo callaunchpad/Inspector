@@ -12,7 +12,7 @@ glove_200d = path.join(glove_dir, 'glove.6B.200d.txt')
 glove_300d = path.join(glove_dir, 'glove.6B.300d.txt')
 
 emb_file = 'emb_dict.pkl'
-save_file(emb_file, make_embeddings_dict(glove_50d))
+# save_file(emb_file, make_embeddings_dict(glove_50d))
 emb_dict = load_file(emb_file)
 dset = Dataset(filename='all_data.csv', path=path.join(path.dirname(path.dirname(path.abspath(__file__))), 'CNN_data'))
 
@@ -28,9 +28,14 @@ def load_data():
     dset = Dataset()
     all_title_embeddings = []
     for title in dset.titles:
+
         title_embeddings = []
         for word in title:
-            title_embeddings.append(emb_dict[word])
+            # word = word.lower()
+            print(word)
+            if not emb_dict.get(word) is None:
+                title_embeddings.append(emb_dict.get('unk')) # POTENTIALLY CHANGE WHAT TO APPEND
+            title_embeddings.append(emb_dict.get(word))
         
         if len(title_embeddings) > 13:
             title_embeddings = title_embeddings[:13]
