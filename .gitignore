@@ -8,3 +8,4 @@ glove.6B.zip
 CNN_data/
 .idea/
 *.pkl
+models/CNN_saves/

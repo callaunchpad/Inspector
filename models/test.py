@@ -4,10 +4,10 @@ from tensorflow import keras
 
 from loader import load_data
 
-from keras.optimizers import SGD
-from keras.losses import BinaryCrossentropy
-from keras import layers
-from keras.models import Model
+from tensorflow.keras.optimizers import SGD
+from tensorflow.keras.losses import BinaryCrossentropy
+from tensorflow.keras import layers
+from tensorflow.keras.models import Model
 
 print("loading data...\n")
 train_title, test_title, train_labels, train_body, test_body, test_labels = load_data()
