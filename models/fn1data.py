@@ -16,13 +16,11 @@ def parse_text(text):
 
 class fn1data():
     def __init__(self):
-
         print("Reading dataset")
-        self.train_titles, self.train_bodies, self.test_titles, self.test_bodies = load_data()
+        self.train_titles, self.train_bodies, self.train_labels, self.test_titles, self.test_bodies, self.test_labels = load_data()
 
 
     def load_data(filename=["train_stances.csv", "train_bodies.csv", "test_bodies.csv", "test_stances_unlabeled.csv"], path='../fnc-1')
-
         train_stance = load_dataset(filename[0]) #train_stance
         test_stance = load_dataset(filename[3]) #test_stance
         train_body = load_dataset(filename[1]) #train_bodies
@@ -34,7 +32,6 @@ class fn1data():
         test_titles = []
         test_bodies = []
         test_labels = []
-
 
         id_to_stance_headlines = {}
         for dict in train_stance:
@@ -50,7 +47,6 @@ class fn1data():
             train_titles.append(parse_text(temp[0]))
             train_labels.append(parse_text(temp[1]))
             train_bodies.append(parse_text(temp[2]))
-
 
         id_to_stance_headlines_test = {}
         for dict in test_stance:
@@ -70,8 +66,7 @@ class fn1data():
         train_titles, train_bodies = word_embeddings(train_titles, train_bodies)
         test_titles, test_bodies = word_embeddings(test_titles, test_bodies)
 
-        return train_titles, train_bodies, test_titles, test_bodies
-
+        return train_titles, train_bodies, train_labels, test_titles, test_bodies, test_labels
 
 
     def load_dataset(filename):
