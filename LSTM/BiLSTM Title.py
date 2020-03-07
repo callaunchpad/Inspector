@@ -6,6 +6,7 @@ from keras.datasets import imdb
 from keras.optimizers import Adam
 from keras.losses import SparseCategoricalCrossentropys
 from keras.callbacks import ModelCheckpoint
+import fn1data
 
 
 input_title = keras.layers.Input(shape = (50, 1))
@@ -32,6 +33,17 @@ model.compile(loss=SparseCategoricalCrossentropys(),
 
 checkpoint = ModelCheckpoint("best_model.hdf5", monitor='loss', verbose=1,
     save_best_only=True, save_weights_only=False, mode='auto', period=1)
+
+
+data = new fn1data()
+
+
+train_title = data.train_titles
+train_body = data.train_bodies
+train_labels = data.train_labels
+test_title = data.test_titles
+test_body = data.test_bodies
+test_labels = data.test_labels
 
 history = model.fit([train_title, train_body],
                     train_labels,
