@@ -1,14 +1,18 @@
 SSH into the High Performance Clusters
 ssh <OCF_Username>@hpcctl.ocf.berkeley.edu
 
-
 check out how to submit jobs here: https://www.ocf.berkeley.edu/docs/services/hpc/slurm/
 Everything below just goes over what is gone over in that link.
 Specifically check out how to do it with sbatch! This makes it so that you dont need to
 keep your terminal window open the whole time.
 
-submit a job:
-sbatch <shell_script>
+submit a job with srun: 
+    srun [flags] [command]
+ex:
+    srun --ntasks=1 --cpus-per-task=4 --mem=8G --gres=gpu:1
+
+submit a job with sbatch:
+    sbatch <shell_script>
 
 Inside the shell script, add something like this:
 #!/bin/bash <--- this always goes at the top of every bash script

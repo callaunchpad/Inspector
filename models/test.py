@@ -47,12 +47,12 @@ x = layers.Dense(40)(x)
 x = layers.Dropout(.11)(x)
 x = layers.Dense(40)(x)
 x = layers.Dropout(.159)(x)
-output = layers.Dense(1, name='output')(x)
+output = layers.Dense(1, activation='sigmoid', name='output')(x)
 
 model = Model(inputs=[title_inputs, body_inputs], outputs=[output], name='CNN_model')
 
 model.compile(loss=BinaryCrossentropy(),
-              optimizer=SGD(momentum=0.303, learning_rate=0.240),
+              optimizer='Adam',
               metrics=['accuracy'])
 
 print("begin training... \n")
