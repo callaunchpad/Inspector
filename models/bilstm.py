@@ -1,19 +1,19 @@
 import numpy as np
 from tensorflow import keras
-from keras.models import Model
-from keras.layers import Dense, Dropout, LSTM, Bidirectional
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Dense, Dropout, LSTM, Bidirectional
 from keras.datasets import imdb
-from keras.optimizers import Adam
-from keras.losses import SparseCategoricalCrossentropys
-from keras.callbacks import ModelCheckpoint
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.losses import SparseCategoricalCrossentropy
+from tensorflow.keras.callbacks import ModelCheckpoint
 from fn1data import fn1data
 
 # Create layers for model
 input_title = keras.layers.Input(shape = (50, 1))
 
 # BiLSTM layer that reads in a title input
-forward_layer_title = LSTM(60)
-backward_layer_title = LSTM(60, return_sequences=True, return_states=True, go_backwards=True)
+forward_layer_title = LSTM(60, return_sequences=True, return_state=True)
+backward_layer_title = LSTM(60, return_sequences=True, return_state=True, go_backwards=True)
 lstm_title, forward_h_title, forward_c_title, backward_h_title, backward_c_title = Bidirectional(forward_layer_title, backward_layer=backward_layer_title)(input_title)
 
 input_body = keras.layers.Input(shape = (50, 1))
@@ -30,7 +30,7 @@ output = Dense(4, activation='softmax')(dropout)
 
 model = Model(inputs=[input_title, input_body], outputs=[output], name='BiLSTM Model')
 
-model.compile(loss=SparseCategoricalCrossentropys(),
+model.compile(loss=SparseCategoricalCrossentropy(),
               optimizer=Adam(learning_rate=1e-3),
               metrics=['accuracy'])
 

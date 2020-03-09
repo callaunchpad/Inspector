@@ -20,7 +20,7 @@ class fn1data():
         self.train_titles, self.train_bodies, self.train_labels, self.test_titles, self.test_bodies, self.test_labels = load_data()
 
 
-    def load_data(filename=["train_stances.csv", "train_bodies.csv", "test_bodies.csv", "test_stances_unlabeled.csv"], path='../fnc-1')
+    def load_data(filename=["train_stances.csv", "train_bodies.csv", "test_bodies.csv", "test_stances_unlabeled.csv"], path='../fnc-1'):
         train_stance = load_dataset(filename[0]) #train_stance
         test_stance = load_dataset(filename[3]) #test_stance
         train_body = load_dataset(filename[1]) #train_bodies
