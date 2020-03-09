@@ -1,7 +1,7 @@
 import numpy as np
 from tensorflow import keras
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Dense, Dropout, LSTM, Bidirectional
+from tensorflow.keras.layers import Dense, Dropout, LSTM, Bidirectional, Concatenate
 from keras.datasets import imdb
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
@@ -12,19 +12,20 @@ from fn1data import fn1data
 input_title = keras.layers.Input(shape = (50, 1))
 
 # BiLSTM layer that reads in a title input
-forward_layer_title = LSTM(60, return_sequences=True, return_state=True)
-backward_layer_title = LSTM(60, return_sequences=True, return_state=True, go_backwards=True)
-lstm_title, forward_h_title, forward_c_title, backward_h_title, backward_c_title = Bidirectional(forward_layer_title, backward_layer=backward_layer_title)(input_title)
+flayer_title = LSTM(60, return_sequences=True, return_state=True)
+blayer_title = LSTM(60, return_sequences=True, return_state=True, go_backwards=True)
+lstm_title, fh_title, fc_title, bh_title, bc_title = Bidirectional(flayer_title, backward_layer=blayer_title)(input_title)
 
 input_body = keras.layers.Input(shape = (50, 1))
 
 # BiLSTM layer that reads in a body input and uses the previous layer's output as initial states
-forward_layer_body = LSTM(60, initial_state=[forward_h_title, forward_c_title])
-backward_layer_body = LSTM(60, return_sequences=True, return_states=True, go_backwards=True, initial_state=[backward_h_title, backward_c_title])
-lstm_body, forward_h_body, forward_c_body, backward_h_body, backward_c_body = Bidirectional(forward_layer_body, backward_layer=backward_layer_body)(input_body)
+flayer_body = LSTM(60, return_sequences=True, return_state=True)
+blayer_body = LSTM(60, return_sequences=True, return_state=True, go_backwards=True)
+lstm_body, fh_body, fc_body, bh_body, bc_body = Bidirectional(flayer_body, backward_layer=blayer_body)\
+    (input_body, initial_state=[fh_title, fc_title, bh_title, bc_title])
 
 # Dense, Dropout and Dense (out) layers
-dense1 = Dense(50, activation='relu')(np.average(forward_h_body, backward_h_body))
+dense1 = Dense(50, activation='relu')(np.average(fh_body, bh_body))
 dropout = Dropout(1e-3)(dense1)
 output = Dense(4, activation='softmax')(dropout)
 
