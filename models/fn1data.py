@@ -12,6 +12,7 @@ import os
 FIELDNAMES = ['Headline', 'Body ID', 'Stance']
 emb_file = 'emb_dict.pkl'
 empty_array = np.array([0]*50)
+labels = {'unrelated': 0, 'discus': 1, 'agree': 2, 'disagree': 3}
 
 def parse_text(text):
     no_punctuation = remove_punc(text)
@@ -51,8 +52,11 @@ class fn1data():
         for train_id in id_to_headlines_stances_bodies:
             temp = id_to_headlines_stances_bodies[train_id]
             all_title_data.append(parse_text(temp[0]))
-            all_label_data.append(parse_text(temp[1]))
+            all_label_data.extend(parse_text(temp[1]))
             all_body_data.append(parse_text(temp[2]))
+
+        for i in range(len(all_label_data)):
+            all_label_data[i] = labels[all_label_data[i]]
 
         all_title_embeddings, all_body_embeddings = self.word_embeddings(all_title_data, all_body_data)
 
