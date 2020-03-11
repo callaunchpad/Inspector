@@ -5,8 +5,13 @@ import sys
 import nlp_tools
 import ctypes
 from nlp_tools import make_embeddings_dict, save_file, load_file, remove_punc, remove_stopwords, lemmatize
+import numpy as np
+import errno
+import os
 
 FIELDNAMES = ['Headline', 'Body ID', 'Stance']
+emb_file = 'emb_dict.pkl'
+empty_array = np.array([0]*50)
 
 def parse_text(text):
     no_punctuation = remove_punc(text)
@@ -17,76 +22,71 @@ def parse_text(text):
 class fn1data():
     def __init__(self):
         print("Reading dataset")
-        self.train_titles, self.train_bodies, self.train_labels, self.test_titles, self.test_bodies, self.test_labels = load_data()
+        self.train_titles, self.train_bodies, self.train_labels, self.test_titles, self.test_bodies, self.test_labels = self.load_data()
 
 
-    def load_data(filename=["train_stances.csv", "train_bodies.csv", "test_bodies.csv", "test_stances_unlabeled.csv"], path='../fnc-1'):
-        train_stance = load_dataset(filename[0]) #train_stance
-        test_stance = load_dataset(filename[3]) #test_stance
-        train_body = load_dataset(filename[1]) #train_bodies
-        test_body = load_dataset(filename[2]) #test_bodies
+    def load_data(self, filename=["train_stances.csv", "train_bodies.csv"], data_path=path.join(path.dirname(path.dirname(path.abspath(__file__))), 'fnc-1')):
+        train_stance = self.load_dataset(filename[0], data_path)
+        train_body = self.load_dataset(filename[1], data_path)
 
-        train_titles = []
-        train_bodies = []
-        train_labels = []
-        test_titles = []
-        test_bodies = []
-        test_labels = []
+        # train_stance: a list of dicts with keys: 'Headline', 'Body ID', 'Stance'
+        # train_body: a list of dicts with keys: 'Body ID', 'articleBody'
 
-        id_to_stance_headlines = {}
-        for dict in train_stance:
-            id = dict['Body ID']
-            stance_headline = [dict['Headline'], dict['Stance']]
-            id_to_stance_headlines[id] = stance_headline
+        all_title_data = []
+        all_body_data = []
+        all_label_data = []
 
-        for dict in train_body:
-            id_to_stance_headlines[dict['Body ID']].append(dict['articleBody'])
+        ### Parse and embed all the data ###
 
-        for id in id_to_stance_headlines:
-            temp = id_to_stance_headlines[id]
-            train_titles.append(parse_text(temp[0]))
-            train_labels.append(parse_text(temp[1]))
-            train_bodies.append(parse_text(temp[2]))
+        id_to_headlines_stances_bodies = {}
+        
+        for train_dict in train_stance:
+            id_article = train_dict['Body ID']
+            headline_stance = [train_dict['Headline'], train_dict['Stance']]
+            id_to_headlines_stances_bodies[id_article] = headline_stance
 
-        id_to_stance_headlines_test = {}
-        for dict in test_stance:
-            id = dict['Body ID']
-            stance_headline_test = [dict['Headline'], dict['Stance']]
-            id_to_stance_headlines_test[id] = stance_headline_test
+        for train_dict in train_body:
+            id_to_headlines_stances_bodies[train_dict['Body ID']].append(train_dict['articleBody'])
 
-        for dict in test_body:
-            id_to_stance_headlines_test[dict['Body ID']].append(dict['articleBody'])
+        for train_id in id_to_headlines_stances_bodies:
+            temp = id_to_headlines_stances_bodies[train_id]
+            all_title_data.append(parse_text(temp[0]))
+            all_label_data.append(parse_text(temp[1]))
+            all_body_data.append(parse_text(temp[2]))
 
-        for id in id_to_stance_headlines_test:
-            temp = id_to_stance_headlines_test[id]
-            test_titles.append(parse_text(temp[0]))
-            test_labels.append(parse_text(temp[1]))
-            test_bodies.append(parse_text(temp[2]))
+        all_title_embeddings, all_body_embeddings = self.word_embeddings(all_title_data, all_body_data)
 
-        train_titles, train_bodies = word_embeddings(train_titles, train_bodies)
-        test_titles, test_bodies = word_embeddings(test_titles, test_bodies)
+        ### Separate into training data and validation data ###
+        
+        train_titles = np.array(all_title_embeddings[:int(len(all_title_embeddings) * 0.75)])
+        test_titles = np.array(all_title_embeddings[int(len(all_title_embeddings) * 0.75):])
+        train_bodies = np.array(all_body_embeddings[:int(len(all_body_embeddings) * 0.75)])
+        test_bodies = np.array(all_body_embeddings[int(len(all_body_embeddings) * 0.75):])
+        train_labels = np.array(all_label_data[:int(len(all_body_embeddings) * 0.75)])
+        test_labels = np.array(all_label_data[int(len(all_body_embeddings) * 0.75):])
 
         return train_titles, train_bodies, train_labels, test_titles, test_bodies, test_labels
 
 
-    def load_dataset(filename):
+    def load_dataset(self, filename, data_path):
         data = None
         try:
-            with open(path.join(self.data_path, filename)) as fh:
+            with open(path.join(data_path, filename), encoding='utf-8') as fh:
                 reader = csv.DictReader(fh)
                 data = list(reader)
 
                 if data is None:
                     error = 'ERROR: No data found in: {}'.format(filename)
-                    raise FNCException(error)
+                    raise error
         except FileNotFoundError:
             error = "ERROR: Could not find file: {}".format(filename)
-            raise FNCException(error)
+            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), filename)
 
         return data
 
 
-    def word_embeddings(titles, bodies):
+    def word_embeddings(self, titles, bodies):
+        emb_dict = load_file(emb_file)
         all_title_embeddings = []
         for title in titles:
 
