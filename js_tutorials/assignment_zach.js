@@ -24,7 +24,7 @@ SEND_NAMES_ENDPOINT = `${MOCK_SERVER_ENDPOINT}/sendNames`;
 // API KEY that we must include in order to have permission to use the API of the mock server.
 // For most web APIs, we need to provide API keys that are generated after signing up to use
 // the web API in our request headers. I've gone ahead and done that step already and pasted the key here.
-API_KEY = 'PMAK-5e6b30d9d696e70038c23500-ce4bc94c3fbe460ace19fa6c2d94ebf64a';
+API_KEY = 'paste from slack';
 
 // function called fetch that let's us send HTTP requests
 // check out the doc here: 
