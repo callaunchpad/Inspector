@@ -10,6 +10,14 @@
 // 1) Make sure you have Node.js installed: https://nodejs.org/en/download/
 // 2) run npm install in the js_tutorials folder
 
+// GOAL:
+// complete the sendNames function so that:
+// 1) it gets an array of our team names from the server
+// 2) it gets a json with a bunch of info on each member in our team
+// 3) it gets the first name and last name of each member with the data from 1 and 2 (or just 2) and
+// sends that info back to the server with a POST request.
+// getNames and getNames promise are utility functions that should complete steps 1 and 2.
+
 // endpoint url of the mock server
 MOCK_SERVER_ENDPOINT = 'https://eab77041-8340-40d6-bfde-248332bc5286.mock.pstmn.io' 
 
