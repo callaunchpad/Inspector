@@ -1,5 +1,5 @@
 SSH into the High Performance Clusters
-ssh <OCF_Username>@hpcctl.ocf.berkeley.edu
+ssh <ocfUsername>@hpcctl.ocf.berkeley.edu
 
 check out how to submit jobs here: https://www.ocf.berkeley.edu/docs/services/hpc/slurm/
 Everything below just goes over what is gone over in that link.
