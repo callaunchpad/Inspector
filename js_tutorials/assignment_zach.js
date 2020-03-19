@@ -148,10 +148,9 @@ async function sendNames() {
         },
         body: JSON.stringify(response_body)
     }).then((response_body) => {
-      //  console.log(response_body.json());
-        let y = response_body.json();
-        console.log(y);
-        return y;
+        response_body.json().then((json) => {
+            console.log(json);
+        })
     });
     // once you get the response body after sending the POST request, 
     // console log the "secret" field of it and lmk what the text is so ik you finished!
