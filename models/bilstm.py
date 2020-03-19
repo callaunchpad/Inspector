@@ -54,7 +54,7 @@ print("Training model on data")
 history = model.fit([train_title, train_body],
                     train_labels,
                     batch_size=32,
-                    epochs=4,
+                    epochs=20,
                     validation_split=0.3,
                     callbacks=[checkpoint])
 
