@@ -50,6 +50,11 @@ def load_data():
 
         all_body_embeddings.append(body_embeddings)
 
+    # shuffle everything
+    triples = list(zip(all_title_embeddings, all_body_embeddings, dset.labels))
+    np.random.shuffle(triples)
+    all_title_embeddings, all_body_embeddings, dset.labels = zip(*triples)
+
     train_title = np.array(all_title_embeddings[:int(len(all_title_embeddings) * 0.75)])
     test_title = np.array(all_title_embeddings[int(len(all_title_embeddings) * 0.75):])
     train_body = np.array(all_body_embeddings[:int(len(all_body_embeddings) * 0.75)])

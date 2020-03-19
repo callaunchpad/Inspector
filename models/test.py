@@ -7,6 +7,7 @@ from loader import load_data
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.losses import BinaryCrossentropy
 from tensorflow.keras import layers
+from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.models import Model
 
 print("loading data...\n")
@@ -49,6 +50,9 @@ x = layers.Dense(40)(x)
 x = layers.Dropout(.159)(x)
 output = layers.Dense(1, activation='sigmoid', name='output')(x)
 
+checkpoint = ModelCheckpoint("./CNN_saves/cnn.ckpt", monitor='loss', verbose=1,
+    save_best_only=True, save_weights_only=False, mode='auto', period=1)
+
 model = Model(inputs=[title_inputs, body_inputs], outputs=[output], name='CNN_model')
 
 model.compile(loss=BinaryCrossentropy(),
@@ -60,7 +64,9 @@ history = model.fit([train_title, train_body],
                     train_labels,
                     batch_size=32,
                     epochs=4,
-                    validation_split=0.3)
+                    validation_split=0.3,
+                    shuffle=True,
+                    callbacks=[checkpoint])
 
 test_scores = model.evaluate([test_title, test_body], y=test_labels, verbose=2)
 print('Test loss:', test_scores[0])
