@@ -76,7 +76,7 @@ function getNamesPromises() {
         return Promise.all([resp1_json, resp2_json]);
     }).then((jsons) => {
         // might be a good idea to take a look at what these response jsons look like
-        console.log(jsons)
+        // console.log(jsons)
 
         return jsons;
     }).catch(e => console.error(e));
@@ -130,29 +130,31 @@ async function sendNames() {
     let member_json = x[0];
     let info_json = x[1];
 
+    // console.log(info_json.Billy.lastName)
+
     let response_body = {};
     // iterate through the members, and match their first names with their last names
     // for each loops are slightly different in javascript!
     member_json.members.forEach((fname, idx) => {
         // TODO!
-
-        response_body[fname] = idx;
+        // console.log(info_json)
+        response_body[fname] = info_json[fname].lastName;
     });
     // does this look right?
     console.log(response_body);
 
     // TODO: make a fetch POST request with Promise or async/await syntax
-    let secret = await fetch(SEND_NAMES_ENDPOINT, {
+    let temp = await fetch(SEND_NAMES_ENDPOINT, {
         method: 'POST',
         headers: {
                 'Content-Type': 'application/json',
                 'x-api-key': API_KEY
         },
-        body: JSON.stringify({response_body})
+        body: JSON.stringify(response_body)
     });
     // once you get the response body after sending the POST request, 
     // console log the "secret" field of it and lmk what the text is so ik you finished!
-    console.log(secret)
+    console.log(temp)
 }
 // send the first and last names of our team members to the server with
 // the sendNames function. It should use one of the getNames functions to do so.
