@@ -91,7 +91,7 @@ function getNamesPromises() {
 async function getNames() {
     try {
         // TODO
-        let [mem_res, name_res] = await Promise.all[
+        let [mem_res, name_res] = await Promise.all([
             fetch(MEMBER_ENDPOINT, {
                 method: 'GET',
                 headers: {
@@ -105,10 +105,10 @@ async function getNames() {
                         'Content-Type': 'application/json',
                         'x-api-key': API_KEY
                 }
-            })];
-        let [mem_json, name_json] = await Promise.all[mem_res.json(), name_res.json()];
+            })]);
+        let [mem_json, name_json] = await Promise.all([mem_res.json(), name_res.json()]);
         // might be a good idea to take a look at what these response jsons look like
-        console.log(mem_json, name_json)
+        // console.log(mem_json, name_json)
         return [mem_json, name_json];
     } catch(e) {
         console.error(e)
@@ -144,7 +144,7 @@ async function sendNames() {
     console.log(response_body);
 
     // TODO: make a fetch POST request with Promise or async/await syntax
-    let temp = await fetch(SEND_NAMES_ENDPOINT, {
+    let secret = await fetch(SEND_NAMES_ENDPOINT, {
         method: 'POST',
         headers: {
                 'Content-Type': 'application/json',
@@ -154,7 +154,8 @@ async function sendNames() {
     });
     // once you get the response body after sending the POST request, 
     // console log the "secret" field of it and lmk what the text is so ik you finished!
-    console.log(temp)
+    secret = await secret.json()
+    console.log(secret)
 }
 // send the first and last names of our team members to the server with
 // the sendNames function. It should use one of the getNames functions to do so.
