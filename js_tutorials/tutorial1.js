@@ -6,25 +6,13 @@
 
 // Here's a link to how HTTP requests are structured: https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages
 
-// BEFORE YOU START:
-// 1) Make sure you have Node.js installed: https://nodejs.org/en/download/
-// 2) run npm install in the js_tutorials folder
-
-// GOAL:
-// complete the sendNames function so that:
-// 1) it gets an array of our team names from the server
-// 2) it gets a json with a bunch of info on each member in our team
-// 3) it gets the first name and last name of each member with the data from 1 and 2 (or just 2) and
-// sends that info back to the server with a POST request.
-// getNames and getNames promise are utility functions that should complete steps 1 and 2.
-
-// endpoint url of the mock server 
-MOCK_SERVER_ENDPOINT = 'https://eab77041-8340-40d6-bfde-248332bc5286.mock.pstmn.io';
+// endpoint url of the mock server
+MOCK_SERVER_ENDPOINT = 'https://eab77041-8340-40d6-bfde-248332bc5286.mock.pstmn.io' 
 
 // endpoint to get the members in our team
 MEMBER_ENDPOINT = `${MOCK_SERVER_ENDPOINT}/getMembers`;
 
-// endpoint to get the info of the members in our team
+// endpoint to get the last names of members in our team
 INFO_ENDPOINT = `${MOCK_SERVER_ENDPOINT}/getLastNames`;
 
 SEND_NAMES_ENDPOINT = `${MOCK_SERVER_ENDPOINT}/sendNames`;
@@ -42,45 +30,28 @@ const fetch = require("node-fetch");
 // The fetches must be run IN PARALLEL, not one after another!
 // returns an Array of json-formatted response bodies
 function getNamesPromises() {
-    // a fetch request follows a format like this:
-    // fetch(endpoint, {
-    //     method: 'GET/POST/PUT/DELETE/etc...',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //         'x-api-key': API_KEY
-    //          ... more header fields...
-    //     }
-    //     body: JSON.stringify({...}) // ONLY IF IT IS A POST REQUEST, we include a body in the json format, and stringify it 
-    // }) 
-
-    // TODO: what should go in the Promise.all array?
-    // Promise.all: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
-    let gotNames = Promise.all([
+    return Promise.all([
         fetch(MEMBER_ENDPOINT, {
             method: 'GET',
             headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': API_KEY
+                'Content-Type': 'application/json',
+                'x-api-key': API_KEY
             }
         }),
         fetch(INFO_ENDPOINT, {
             method: 'GET',
             headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': API_KEY
+                'Content-Type': 'application/json',
+                'x-api-key': API_KEY
             }
         })
     ]).then((response) => {
-        let resp1_json = response[0].json();
-        let resp2_json = response[1].json();
-        return Promise.all([resp1_json, resp2_json]);
+        // since we are using Promise.all, we get a 2-element array with the responses in it
+        return Promise.all([response[0].json(), response[1].json()]);
     }).then((jsons) => {
-        // might be a good idea to take a look at what these response jsons look like
-        console.log(jsons)
-
+        // console.log(jsons[0], jsons[1]);
         return jsons;
     }).catch(e => console.error(e));
-    return gotNames;
 }
 
 // Use the async/await syntax with fetch to make a request to the mock server.
@@ -90,25 +61,28 @@ function getNamesPromises() {
 // returns an Array of json-formatted response bodies
 async function getNames() {
     try {
-        // TODO
-        let [mem_res, name_res] = await Promise.all[
+        let [mem_res, name_res] = await Promise.all([
             fetch(MEMBER_ENDPOINT, {
                 method: 'GET',
                 headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': API_KEY
+                    'Content-Type': 'application/json',
+                    'x-api-key': API_KEY
                 }
             }),
             fetch(INFO_ENDPOINT, {
                 method: 'GET',
                 headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': API_KEY
+                    'Content-Type': 'application/json',
+                    'x-api-key': API_KEY
                 }
-            })];
-        let [mem_json, name_json] = await Promise.all[mem_res.json(), name_res.json()];
-        // might be a good idea to take a look at what these response jsons look like
-        console.log(mem_json, name_json)
+            })
+        ]);
+        let [mem_json, name_json] = await Promise.all([
+            mem_res.json(),
+            name_res.json()
+        ]);
+        // console.log(mem_json);
+        // console.log(name_json);
         return [mem_json, name_json];
     } catch(e) {
         console.error(e)
@@ -122,37 +96,39 @@ async function getNames() {
 // the POST body should be of this json format:
 // { first name: last name, } i.e { Billy: Wang, David: Shau}
 async function sendNames() {
-    // get the json that contains the array of team member first names, and the json
-    // that contains a key-value format of our first names followed by a json of information
-    let x = await getNamesPromises();
-    // console.log(x);
-
-    let member_json = x[0];
-    let info_json = x[1];
+    try {
+        var info = await getNamesPromises(); // notice how we're using var instead of let here, cuz var is function scoped
+        console.log(info)
+    } catch(e) {
+        console.error(e)
+    };
+    member_json = info[0];
+    info_json = info[1];
 
     let response_body = {};
     // iterate through the members, and match their first names with their last names
     // for each loops are slightly different in javascript!
+    console.log(member_json);
+    console.log(info_json);
     member_json.members.forEach((fname, idx) => {
-        // TODO!
-
-        response_body[fname] = idx;
+        response_body[fname] = info_json[fname].lastName
     });
     // does this look right?
     console.log(response_body);
 
-    // TODO: make a fetch POST request with Promise or async/await syntax
-    let secret = await fetch(SEND_NAMES_ENDPOINT, {
+    // make a fetch POST request with Promise or async/await syntax
+    let response = await fetch(SEND_NAMES_ENDPOINT, {
         method: 'POST',
         headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': API_KEY
+            'Content-Type': 'application/json',
+            'x-api-key': API_KEY
         },
-        body: JSON.stringify({response_body})
+        body: JSON.stringify(response_body)
     });
-    // once you get the response body after sending the POST request, 
-    // console log the "secret" field of it and lmk what the text is so ik you finished!
-    console.log(secret)
+    let response_json = await response.json();
+    
+    // lmk what the secret is so ik you finished!
+    console.log(response_json.secret)
 }
 // send the first and last names of our team members to the server with
 // the sendNames function. It should use one of the getNames functions to do so.
