@@ -40,7 +40,7 @@ const fetch = require("node-fetch");
 
 // Use the promises syntax with .then and .catch and fetch to make a request to the mock server.
 // The fetches must be run IN PARALLEL, not one after another!
-// returns an Array of json-formatted response bodies
+// returns a PROMISE for an Array of json-formatted response bodies
 function getNamesPromises() {
     // a fetch request follows a format like this:
     // fetch(endpoint, {
@@ -70,8 +70,7 @@ function getNamesPromises() {
             'x-api-key': API_KEY
         }
     }
-    )]);
-    gotNames.then((response) => {
+    )]).then((response) => {
         // TODO
         
         return Promise.all([response[0].json(), response[1].json()]);
@@ -81,13 +80,14 @@ function getNamesPromises() {
 
         return jsons;
     }).catch(e => console.error(e));
+    return gotNames;
 }
 
 // Use the async/await syntax with fetch to make a request to the mock server.
 // The fetches must be run IN PARALLEL, not one after another!
 // You should always surround await ... in try/catch blocks in case the 
 // request fails to go through, which occurs pretty often in the real world
-// returns an Array of json-formatted response bodies
+// returns an Array of json-formatted response bodies WHEN AWAITED
 async function getNames() {
     try {
         // TODO
