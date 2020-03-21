@@ -109,7 +109,7 @@ async function getNames() {
         let [mem_json, name_json] = await Promise.all([mem_res.json(), name_res.json()]);
 
         // might be a good idea to take a look at what these response jsons look like
-        //console.log(mem_json, name_json);
+        console.log(mem_json, name_json);
         return [mem_json, name_json];
     } catch(e) {
         console.error(e)
@@ -125,7 +125,7 @@ async function getNames() {
 async function sendNames() {
     // get the json that contains the array of team member first names, and the json
     // that contains a key-value format of our first names followed by a json of information
-    let x = await getNames();
+    let x = getNames();
     let member_json = x[0];
     let info_json = x[1];
 

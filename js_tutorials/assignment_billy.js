@@ -76,7 +76,7 @@ function getNamesPromises() {
         return Promise.all([resp1_json, resp2_json]);
     }).then((jsons) => {
         // might be a good idea to take a look at what these response jsons look like
-        console.log(jsons)
+        // console.log(jsons)
 
         return jsons;
     }).catch(e => console.error(e));
@@ -91,7 +91,7 @@ function getNamesPromises() {
 async function getNames() {
     try {
         // TODO
-        let [mem_res, name_res] = await Promise.all[
+        let [mem_res, name_res] = await Promise.all([
             fetch(MEMBER_ENDPOINT, {
                 method: 'GET',
                 headers: {
@@ -105,10 +105,10 @@ async function getNames() {
                         'Content-Type': 'application/json',
                         'x-api-key': API_KEY
                 }
-            })];
-        let [mem_json, name_json] = await Promise.all[mem_res.json(), name_res.json()];
+            })]);
+        let [mem_json, name_json] = await Promise.all([mem_res.json(), name_res.json()]);
         // might be a good idea to take a look at what these response jsons look like
-        console.log(mem_json, name_json)
+        // console.log(mem_json, name_json)
         return [mem_json, name_json];
     } catch(e) {
         console.error(e)
@@ -130,13 +130,15 @@ async function sendNames() {
     let member_json = x[0];
     let info_json = x[1];
 
+    // console.log(info_json.Billy.lastName)
+
     let response_body = {};
     // iterate through the members, and match their first names with their last names
     // for each loops are slightly different in javascript!
     member_json.members.forEach((fname, idx) => {
         // TODO!
-
-        response_body[fname] = idx;
+        // console.log(info_json)
+        response_body[fname] = info_json[fname].lastName;
     });
     // does this look right?
     console.log(response_body);
@@ -148,10 +150,11 @@ async function sendNames() {
                 'Content-Type': 'application/json',
                 'x-api-key': API_KEY
         },
-        body: JSON.stringify({response_body})
+        body: JSON.stringify(response_body)
     });
     // once you get the response body after sending the POST request, 
     // console log the "secret" field of it and lmk what the text is so ik you finished!
+    secret = await secret.json()
     console.log(secret)
 }
 // send the first and last names of our team members to the server with
