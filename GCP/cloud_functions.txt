@@ -1,3 +1,13 @@
+Install glcoud command line interface: 
+    https://cloud.google.com/sdk/docs/downloads-versioned-archives
+
+Initialize google cloud after installing
+    gcloud init
+    Under "pick configuration to use", select "create a new configuration"
+    enter "inspector-project" for the name. It can actually be anything tbh.
+    The command line should take you to a sign in page on your brower. Log in with the INSPECTOR GMAIL.
+    under "pick cloud project to use", select "inspector-project"
+
 Deploy the function called <function_name> to Google Cloud.
     * Make sure that you are in the same directory as the file with the function   
     you wanna deploy
