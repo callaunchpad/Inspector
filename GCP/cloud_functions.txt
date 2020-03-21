@@ -1,10 +1,1 @@
-Deploy the function called <function_name> to Google Cloud.
-    * Make sure that you are in the same directory as the file with the function   
-    you wanna deploy
-Doc reference: https://cloud.google.com/sdk/gcloud/reference/functions/deploy
-
-gcloud functions deploy <function_name> --runtime python37 --trigger-http --memory=2048MB
-
-
-Test sending a request
-curl "https://REGION-PROJECT_ID.cloudfunctions.net/<deployed_function>" 
+Doc Link: https://docs.google.com/document/d/1GCEwy38eW0IkKPz6Zk-gKGWem6eThhsIYA6j_-aua_c/edit?usp=sharing
