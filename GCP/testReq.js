@@ -22,4 +22,4 @@ async function makeReq() {
         console.error(e)
     }
 }
-makeReq()
+//makeReq()
