@@ -9,3 +9,4 @@ CNN_data/
 .idea/
 *.pkl
 models/CNN_saves/
+.vscode
