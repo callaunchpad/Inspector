@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib as plt
+import tensorflow as tf
 from tensorflow import keras
 
 from loader import load_data
@@ -9,6 +10,14 @@ from tensorflow.keras.losses import BinaryCrossentropy
 from tensorflow.keras import layers
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.models import Model
+
+# GPU stuff
+# global boolean for using GPU or not
+USE_GPU = True
+if USE_GPU:
+    tf.debugging.set_log_device_placement(True)
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    print(gpus)
 
 print("loading data...\n")
 train_title, test_title, train_labels, train_body, test_body, test_labels = load_data()
@@ -50,7 +59,7 @@ x = layers.Dense(40)(x)
 x = layers.Dropout(.159)(x)
 output = layers.Dense(1, activation='sigmoid', name='output')(x)
 
-checkpoint = ModelCheckpoint("./CNN_saves/cnn.ckpt", monitor='loss', verbose=1,
+checkpoint = ModelCheckpoint("./CNN_saves/cnn.ckpt", monitor='val_acc', verbose=1,
     save_best_only=True, save_weights_only=False, mode='auto', period=1)
 
 model = Model(inputs=[title_inputs, body_inputs], outputs=[output], name='CNN_model')
@@ -63,7 +72,7 @@ print("begin training... \n")
 history = model.fit([train_title, train_body],
                     train_labels,
                     batch_size=32,
-                    epochs=4,
+                    epochs=3,
                     validation_split=0.3,
                     shuffle=True,
                     callbacks=[checkpoint])
