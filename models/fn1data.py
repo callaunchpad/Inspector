@@ -9,6 +9,11 @@ import numpy as np
 import errno
 import os
 
+# num_title_embeddings = 13
+# num_body_embeddings = 500
+num_title_embeddings = 15
+num_body_embeddings = 40
+
 FIELDNAMES = ['Headline', 'Body ID', 'Stance']
 emb_file = 'emb_dict.pkl'
 empty_array = np.array([0]*50)
@@ -104,10 +109,10 @@ class fn1data():
                 else:
                     title_embeddings.append(emb_dict.get(word))
 
-            if len(title_embeddings) > 13:
-                title_embeddings = title_embeddings[:13]
-            elif len(title_embeddings) < 13:
-                while len(title_embeddings) < 13:
+            if len(title_embeddings) > num_title_embeddings:
+                title_embeddings = title_embeddings[:num_title_embeddings]
+            elif len(title_embeddings) < num_title_embeddings:
+                while len(title_embeddings) < num_title_embeddings:
                     title_embeddings.append(empty_array)
 
             all_title_embeddings.append(title_embeddings)
@@ -122,10 +127,10 @@ class fn1data():
                 else:
                     body_embeddings.append(emb_dict[word])
 
-            if len(body_embeddings) > 500:
-                body_embeddings = body_embeddings[:500]
-            elif len(body_embeddings) < 500:
-                while len(body_embeddings) < 500:
+            if len(body_embeddings) > num_body_embeddings:
+                body_embeddings = body_embeddings[:num_body_embeddings]
+            elif len(body_embeddings) < num_body_embeddings:
+                while len(body_embeddings) < num_body_embeddings:
                     body_embeddings.append(empty_array)
 
             all_body_embeddings.append(body_embeddings)

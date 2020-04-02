@@ -19,8 +19,10 @@ if USE_GPU:
 
 # Load data
 embedding_size = 50
-num_title_embeddings = 13
-num_body_embeddings = 500
+# num_title_embeddings = 13
+# num_body_embeddings = 500
+num_title_embeddings = 15
+num_body_embeddings = 40
 data = fn1data()
 train_title = data.train_titles
 train_body = data.train_bodies
@@ -33,22 +35,24 @@ test_labels = data.test_labels
 input_title = keras.layers.Input(shape = (num_title_embeddings, embedding_size))
 
 # BiLSTM layer that reads in a title input
-flayer_title = LSTM(60, return_sequences=True, return_state=True)
-blayer_title = LSTM(60, return_sequences=True, return_state=True, go_backwards=True)
+flayer_title = LSTM(60, return_state=True)
+blayer_title = LSTM(60, return_state=True, go_backwards=True)
 lstm_title, fh_title, fc_title, bh_title, bc_title = Bidirectional(flayer_title, backward_layer=blayer_title)(input_title)
 
 input_body = keras.layers.Input(shape = (num_body_embeddings, embedding_size))
 
 # BiLSTM layer that reads in a body input and uses the previous layer's output as initial states
-flayer_body = LSTM(60, return_sequences=True, return_state=True)
-blayer_body = LSTM(60, return_sequences=True, return_state=True, go_backwards=True)
+flayer_body = LSTM(60, return_state=True)
+blayer_body = LSTM(60, return_state=True, go_backwards=True)
 lstm_body, fh_body, fc_body, bh_body, bc_body = Bidirectional(flayer_body, backward_layer=blayer_body)\
     (input_body, initial_state=[fh_title, fc_title, bh_title, bc_title])
 
 # Dense, Dropout and Dense (out) layers
-dense1 = Dense(50, activation='relu')(keras.layers.average([fh_body, bh_body]))
-dropout = Dropout(1e-3)(dense1)
-output = Dense(4, activation='softmax')(dropout)
+dense1 = Dense(128, activation='relu')(keras.layers.average([fh_body, bh_body]))
+dropout1 = Dropout(1e-3)(dense1)
+dense2 = Dense(64, activation='relu')(dropout1)
+dropout2 = Dropout(1e-3)(dense2)
+output = Dense(4, activation='softmax')(dropout2)
 
 model = Model(inputs=[input_title, input_body], outputs=[output], name='BiLSTM_Model')
 

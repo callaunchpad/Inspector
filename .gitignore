@@ -6,5 +6,6 @@ fnc-1.zip
 glove.6B
 glove.6B.zip
 CNN_data/
+models/uncased_L-12_H-768_A-12/
 .idea/
 *.pkl
