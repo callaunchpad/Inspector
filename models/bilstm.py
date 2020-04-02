@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense, Dropout, LSTM, Bidirectional, Concatenate
@@ -7,6 +8,14 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.callbacks import ModelCheckpoint
 from fn1data import fn1data
+
+# GPU stuff
+# global boolean for using GPU or not
+USE_GPU = True
+if USE_GPU:
+    tf.debugging.set_log_device_placement(True)
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    print('GPUs available: ', gpus)
 
 # Load data
 embedding_size = 50
@@ -47,7 +56,7 @@ model.compile(loss=SparseCategoricalCrossentropy(),
               optimizer=Adam(learning_rate=1e-3),
               metrics=['accuracy'])
 
-checkpoint = ModelCheckpoint("best_model.hdf5", monitor='loss', verbose=1,
+checkpoint = ModelCheckpoint("./LSTM_saves/lstm.ckpt", monitor='val_acc', verbose=1,
     save_best_only=True, save_weights_only=False, mode='auto', period=1)
 
 print("Training model on data")
@@ -55,6 +64,7 @@ history = model.fit([train_title, train_body],
                     train_labels,
                     batch_size=32,
                     epochs=20,
+                    shuffle=True,
                     validation_split=0.3,
                     callbacks=[checkpoint])
 
