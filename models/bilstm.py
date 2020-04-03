@@ -8,6 +8,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.callbacks import ModelCheckpoint
 from fn1data import fn1data
+from testData import DataSet
 
 # GPU stuff
 # global boolean for using GPU or not
@@ -23,6 +24,7 @@ embedding_size = 50
 # num_body_embeddings = 500
 num_title_embeddings = 15
 num_body_embeddings = 40
+
 data = fn1data()
 train_title = data.train_titles
 train_body = data.train_bodies
@@ -30,6 +32,10 @@ train_labels = data.train_labels
 test_title = data.test_titles
 test_body = data.test_bodies
 test_labels = data.test_labels
+
+print('title length:', len(train_title))
+
+print('body length:', len(train_body))
 
 # Create layers for model
 input_title = keras.layers.Input(shape = (num_title_embeddings, embedding_size))

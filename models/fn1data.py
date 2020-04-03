@@ -17,7 +17,7 @@ num_body_embeddings = 40
 FIELDNAMES = ['Headline', 'Body ID', 'Stance']
 emb_file = 'emb_dict.pkl'
 empty_array = np.array([0]*50)
-labels = {'unrelated': 0, 'discus': 1, 'agree': 2, 'disagree': 3}
+labels = {'unrelated': 0, 'discuss': 1, 'agree': 2, 'disagree': 3}
 
 def parse_text(text):
     no_punctuation = remove_punc(text)
@@ -44,24 +44,43 @@ class fn1data():
 
         ### Parse and embed all the data ###
 
-        id_to_headlines_stances_bodies = {}
+        # put all article bodies into a dictionary
+        article_bodies = dict()
+        for body in train_body:
+            body_id = body['Body ID']
+            body_text = parse_text(body['articleBody'])
+            article_bodies[body_id] = body_text
+
+        # generate all 50k data points by mapping each stance into a data point
+        for s in train_stance:
+            # get the body ID
+            title = parse_text(s['Headline'])
+            all_title_data.append(title)
+
+            stance = s['Stance']
+            all_label_data.append(labels[stance])
+
+            body_id = s['Body ID']
+            all_body_data.append(article_bodies[body_id])
+
+        # id_to_headlines_stances_bodies = {}
         
-        for train_dict in train_stance:
-            id_article = train_dict['Body ID']
-            headline_stance = [train_dict['Headline'], train_dict['Stance']]
-            id_to_headlines_stances_bodies[id_article] = headline_stance
+        # for train_dict in train_stance:
+        #     id_article = train_dict['Body ID']
+        #     headline_stance = [train_dict['Headline'], train_dict['Stance']]
+        #     id_to_headlines_stances_bodies[id_article] = headline_stance
 
-        for train_dict in train_body:
-            id_to_headlines_stances_bodies[train_dict['Body ID']].append(train_dict['articleBody'])
+        # for train_dict in train_body:
+        #     id_to_headlines_stances_bodies[train_dict['Body ID']].append(train_dict['articleBody'])
 
-        for train_id in id_to_headlines_stances_bodies:
-            temp = id_to_headlines_stances_bodies[train_id]
-            all_title_data.append(parse_text(temp[0]))
-            all_label_data.extend(parse_text(temp[1]))
-            all_body_data.append(parse_text(temp[2]))
+        # for train_id in id_to_headlines_stances_bodies:
+        #     temp = id_to_headlines_stances_bodies[train_id]
+        #     all_title_data.append(parse_text(temp[0]))
+        #     all_label_data.extend(parse_text(temp[1]))
+        #     all_body_data.append(parse_text(temp[2]))
 
-        for i in range(len(all_label_data)):
-            all_label_data[i] = labels[all_label_data[i]]
+        # for i in range(len(all_label_data)):
+        #     all_label_data[i] = labels[all_label_data[i]]
 
         all_title_embeddings, all_body_embeddings = self.word_embeddings(all_title_data, all_body_data)
 
@@ -83,7 +102,7 @@ class fn1data():
             with open(path.join(data_path, filename), encoding='utf-8') as fh:
                 reader = csv.DictReader(fh)
                 data = list(reader)
-
+                print("reader length for data {0} is {1}".format(filename, len(data)))
                 if data is None:
                     error = 'ERROR: No data found in: {}'.format(filename)
                     raise error
