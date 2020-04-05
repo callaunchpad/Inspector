@@ -3,9 +3,13 @@ from tensorflow import keras
 from os import path
 from nlp_tools import save_file, load_file
 from dataset import Dataset
+from bert import tokenization
+import pandas as pd
 
+print("loading data...\n")
 # dset_file = 'dataset_obj.pkl'
 # dset = load_file(dset_file)
+print("loaded data!")
 
 model_dir = path.join(path.dirname(path.abspath(__file__)), 'uncased_L-12_H-768_A-12')
 model_ckpt = path.join(model_dir, "bert_model.ckpt")
@@ -22,10 +26,11 @@ max_seq_len = 128
 # you can print out each step to see if things look correct
 
 #Getting the data:
+train = pd.read_csv("../CNN_data/all_data.csv")
 input_articles = []
     
 #creating BERT tokenizer:
-tokenizer = bert.FullTokenizer(
+tokenizer = tokenization.FullTokenizer(
   vocab_file=path.join(model_dir, "vocab.txt")
 )
 input_tokens = []
@@ -37,21 +42,16 @@ for text in input_articles:
     token_ids = token_ids + [0] * (max_seq_len - len(token_ids))
     input_tokens.append(token_ids)
 
-
 l_input_ids = keras.layers.Input(shape=(max_seq_len,), dtype='int32')
 
 # using the default token_type/segment id 0
-output = l_bert(l_input_ids)                              # output: [batch_size, max_seq_len, hidden_size]
-
-# # provide a custom token_type/segment id as a layer input
-# output = l_bert([l_input_ids, l_token_type_ids])          # [batch_size, max_seq_len, hidden_size]
-# model = keras.Model(inputs=[l_input_ids, l_token_type_ids], outputs=output)
-# model.build(input_shape=[(None, max_seq_len), (None, max_seq_len)])
+output = l_bert(l_input_ids)                    # output: [batch_size, max_seq_len, hidden_size]
 
 
 # The Bert output should be a vector of size [batch_size, hidden_size]. 
 # Do this by getting only the first word encoding of the [CLS] token
 # Take a look at Keras Lambda Layers for this.
+cls_out = keras.layers.Lambda(lambda seq: seq[:, 0, :])(output)
 
 dense = keras.layers.Dense(2, activation='sigmoid')(output)
 soft = keras.layers.Softmax(axis=-1)(dense)
