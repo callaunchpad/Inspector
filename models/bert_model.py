@@ -7,8 +7,8 @@ from bert import tokenization
 import pandas as pd
 
 print("loading data...\n")
-# dset_file = 'dataset_obj.pkl'
-# dset = load_file(dset_file)
+dset_file = 'dataset_obj.pkl'
+dset = load_file(dset_file)
 print("loaded data!")
 
 model_dir = path.join(path.dirname(path.abspath(__file__)), 'uncased_L-12_H-768_A-12')
