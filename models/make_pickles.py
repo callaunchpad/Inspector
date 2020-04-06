@@ -1,6 +1,7 @@
 from dataset import Dataset
 from os import path
 from nlp_tools import save_file, load_file, make_embeddings_dict
+from bert_data import BertData
 
 THIS_FOLDER = path.dirname(path.abspath(__file__))
 
@@ -13,9 +14,13 @@ glove_300d = path.join(glove_dir, 'glove.6B.300d.txt')
 
 emb_file = 'emb_dict.pkl'
 dset_file = 'dataset_obj.pkl'
+bertdata_file = 'bertdata.pkl'
 
 print("making word embedding dictionary pkl...")
 save_file(emb_file, make_embeddings_dict(glove_50d))
 print("making datset object pkl")
 dset = Dataset(filename='all_data.csv', path=path.join(path.dirname(path.dirname(path.abspath(__file__))), 'CNN_data'))
 save_file("dataset_obj.pkl", dset)
+print('making bert data pkl')
+bertdata = BertData()
+save_file(bertdata_file, bertdata)
