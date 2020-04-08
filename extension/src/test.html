@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      rel="stylesheet"
+      integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="popup.css">
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <script type="module"> import Mercury from '@postlight/mercury-parser'; </script>
+    <script type="text/javascript" src="test.js"></script>
+  </head>
+  <body>
+    <div class="container slider-one-active">
+      <div class="steps">
+        <div class="step step-one">
+          <div class="liner"></div>
+          <span>Hello!</span>
+        </div>
+        <div class="step step-two">
+          <div class="liner"></div>
+          <span>Rating</span>
+        </div>
+        <div class="step step-three">
+          <div class="liner"></div>
+          <span>Conclusion</span>
+        </div>
+      </div>
+      <div class="line">
+        <div class="dot-move"></div>
+        <div class="dot zero"></div>
+        <div class="dot center"></div>
+        <div class="dot full"></div>
+      </div>
+      <div class="slider-ctr">
+        <div class="slider">
+          <form class="slider-form slider-one">
+            <h2>Highlight the article title</h2>
+            <label class="input">
+              <input type="text" class="name" placeholder="What's your name?">
+            </label>
+            <button class="first next">Next Step</button>
+          </form>
+          <form class="slider-form slider-two">
+            <h2>Highlight the article text</h2>
+            <div class="label-ctr">
+              <label class="radio">
+                <input type="radio" value="happy" name="condition">
+                <div class="emot happy">
+                  <div class="mouth sad"></div>
+                </div>
+              </label>
+              <label class="radio">
+                <input type="radio" value="happy" name="condition">
+                <div class="emot happy">
+                  <div class="mouth smile"></div>
+                </div>
+              </label>
+            </div>
+            <button class="second next">Next Step</button>
+          </form>
+          <div class="slider-form slider-three">
+            <h3>Hit to button below to process the article</h3>
+            <button class="inspect" href="#" target="_blank">Inspect</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
