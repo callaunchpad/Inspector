@@ -12,9 +12,10 @@ class BertData():
         text_col = 'text'
         label_col = 'type'
         model_dir = path.join(path.dirname(path.abspath(__file__)), 'uncased_L-12_H-768_A-12')
+        cnndata_dir = path.join(path.dirname(path.dirname(path.abspath(__file__))), 'CNN_data')
 
         print('loading bert data...')
-        train_data = pd.read_csv("../CNN_data/all_data.csv")
+        train_data = pd.read_csv(path.join(cnndata_dir, 'all_data.csv'))
         tokenizer = bert_tokenization.FullTokenizer(vocab_file=path.join(model_dir, "vocab.txt"))
         input_tokens = []
         input_labels = []
@@ -31,7 +32,11 @@ class BertData():
             token_ids = token_ids + [0] * (max_seq_len - len(token_ids))
             
             input_tokens.append(token_ids)
-            input_labels.append(label)
+            if (label == 'real'):
+                input_labels.append(1)
+            elif (label == 'fake'):
+                input_labels.append(0)
+            
         print('loaded and processed bert data!')
 
         doubles = list(zip(input_tokens, input_labels))
