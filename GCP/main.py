@@ -100,8 +100,7 @@ def handler():
     global model
     content = request.get_json()
     input = [0, 0]
-    input[0] = content['title']
-    input[1] = content['body']
+    input[0], input[1] = process_input(content['title'], content['body'])
     class_names = [0, 1]
 
 
