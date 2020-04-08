@@ -95,8 +95,7 @@ def download_blob(bucket_name, source_blob_name, destination_file_name):
         source_blob_name,
         destination_file_name))
 
-@app.route('/postjson', methods = ['POST'])
-def handler():
+def handler(input):
     global model
     content = request.get_json()
     input = [0, 0]
