@@ -10,7 +10,7 @@ from flask import jsonify
 from flask import Flask
 from flask import request
 from os import path
-from nlp_tools import remove_punc
+from nlp_tools import remove_punc, remove_stopwords, lemmatize
 app = Flask(__name__)
 
 model = None
@@ -97,9 +97,14 @@ def download_blob(bucket_name, source_blob_name, destination_file_name):
         destination_file_name))
 
 def nltk_test(inp):
+    # looks like request.get_json() and the input.get_json() do the same thing
     print(request.get_json())
     print(inp.get_json())
     print(remove_punc("this, is some sample text."))
+    arr = remove_punc("this, is some sample text.")
+    arr = remove_stopwords(arr)
+    arr = lemmatize(arr)
+    print(arr)
 
 def handler(input):
     global model
