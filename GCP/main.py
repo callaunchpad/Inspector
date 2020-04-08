@@ -7,6 +7,10 @@ from tensorflow.keras.layers import Dense, Flatten, Conv2D
 from tensorflow.keras import Model
 import flask
 from flask import jsonify
+from flask import Flask
+from flask import request
+
+app = Flask(__name__)
 
 model = None
 
@@ -47,6 +51,37 @@ class CustomModel(Model):
                       optimizer='Adam',
                       metrics=['accuracy'])
 
+        def process_input(title, body):
+            empty_array = np.array([0]*50)
+            emb_dict = load_file(emb_file)
+            title_embedding = []
+            for word in title:
+                if emb_dict.get(word) is None:
+                    title_embedding.append(emb_dict.get('unk')) # POTENTIALLY CHANGE WHAT TO APPEND
+                else:
+                    title_embedding.append(emb_dict.get(word))
+            if len(title_embedding) > 13:
+                title_embedding = title_embedding[:13]
+            elif len(title_embedding) < 13:
+                while len(title_embedding) < 13:
+                    title_embedding.append(empty_array)
+
+            body_embedding = []
+            for word in body:
+                # if the word is OOV, append the unk vector
+                if emb_dict.get(word) is None:
+                    body_embedding.append(emb_dict.get('unk')) # POTENTIALLY CHANGE WHAT TO APPEND
+                else:
+                    body_embedding.append(emb_dict[word])
+
+            if len(body_embedding) > 500:
+                body_embedding = body_embedding[:500]
+            elif len(body_embedding) < 500:
+                while len(body_embedding) < 500:
+                    body_embeddings.append(empty_array)
+
+            return title_embedding, body_embedding
+
 
 def download_blob(bucket_name, source_blob_name, destination_file_name):
     """Downloads a blob from the bucket."""
@@ -60,10 +95,15 @@ def download_blob(bucket_name, source_blob_name, destination_file_name):
         source_blob_name,
         destination_file_name))
 
-def handler(request):
+@app.route('/postjson', methods = ['POST'])
+def handler():
     global model
+    content = request.get_json()
+    input = [0, 0]
+    input[0] = content['title']
+    input[1] = content['body']
     class_names = [0, 1]
-    input = request
+
 
     # Model load which only happens during cold starts
     if model is None:
