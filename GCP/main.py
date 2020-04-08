@@ -54,44 +54,44 @@ class CustomModel(Model):
                       optimizer='Adam',
                       metrics=['accuracy'])
 
-        def process_input(title, body):
-            arr_title = remove_punc(title)
-            arr_title = remove_stopwords(arr_title)
-            arr_title = lemmatize(arr_title)
+def process_input(title, body):
+    arr_title = remove_punc(title)
+    arr_title = remove_stopwords(arr_title)
+    arr_title = lemmatize(arr_title)
 
-            arr_body = remove_punc(body)
-            arr_body = remove_stopwords(arr_body)
-            arr_body = lemmatize(arr_body)
+    arr_body = remove_punc(body)
+    arr_body = remove_stopwords(arr_body)
+    arr_body = lemmatize(arr_body)
 
-            empty_array = np.array([0]*50)
-            emb_dict = load_file(emb_file)
-            title_embedding = []
-            for word in arr_title:
-                if emb_dict.get(word) is None:
-                    title_embedding.append(emb_dict.get('unk')) # POTENTIALLY CHANGE WHAT TO APPEND
-                else:
-                    title_embedding.append(emb_dict.get(word))
-            if len(title_embedding) > 13:
-                title_embedding = title_embedding[:13]
-            elif len(title_embedding) < 13:
-                while len(title_embedding) < 13:
-                    title_embedding.append(empty_array)
+    empty_array = np.array([0]*50)
+    emb_dict = load_file(emb_file)
+    title_embedding = []
+    for word in arr_title:
+        if emb_dict.get(word) is None:
+            title_embedding.append(emb_dict.get('unk')) # POTENTIALLY CHANGE WHAT TO APPEND
+        else:
+            title_embedding.append(emb_dict.get(word))
+    if len(title_embedding) > 13:
+        title_embedding = title_embedding[:13]
+    elif len(title_embedding) < 13:
+        while len(title_embedding) < 13:
+            title_embedding.append(empty_array)
 
-            body_embedding = []
-            for word in arr_body:
-                # if the word is OOV, append the unk vector
-                if emb_dict.get(word) is None:
-                    body_embedding.append(emb_dict.get('unk')) # POTENTIALLY CHANGE WHAT TO APPEND
-                else:
-                    body_embedding.append(emb_dict[word])
+    body_embedding = []
+    for word in arr_body:
+        # if the word is OOV, append the unk vector
+        if emb_dict.get(word) is None:
+            body_embedding.append(emb_dict.get('unk')) # POTENTIALLY CHANGE WHAT TO APPEND
+        else:
+            body_embedding.append(emb_dict[word])
 
-            if len(body_embedding) > 500:
-                body_embedding = body_embedding[:500]
-            elif len(body_embedding) < 500:
-                while len(body_embedding) < 500:
-                    body_embedding.append(empty_array)
+    if len(body_embedding) > 500:
+        body_embedding = body_embedding[:500]
+    elif len(body_embedding) < 500:
+        while len(body_embedding) < 500:
+            body_embedding.append(empty_array)
 
-            return title_embedding, body_embedding
+    return title_embedding, body_embedding
 
 
 def download_blob(bucket_name, source_blob_name, destination_file_name):
