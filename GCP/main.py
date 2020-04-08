@@ -54,6 +54,18 @@ class CustomModel(Model):
                       optimizer='Adam',
                       metrics=['accuracy'])
 
+def download_blob(bucket_name, source_blob_name, destination_file_name):
+    """Downloads a blob from the bucket."""
+    storage_client = storage.Client()
+    bucket = storage_client.get_bucket(bucket_name)
+    blob = bucket.blob(source_blob_name)
+
+    blob.download_to_filename(destination_file_name)
+
+    print('Blob {} downloaded to {}.'.format(
+        source_blob_name,
+        destination_file_name))
+
 def process_input(title, body):
     arr_title = remove_punc(title)
     arr_title = remove_stopwords(arr_title)
@@ -64,7 +76,10 @@ def process_input(title, body):
     arr_body = lemmatize(arr_body)
 
     empty_array = np.array([0]*50)
-    emb_dict = load_file(emb_file)
+
+    download_blob('cnn_model_inspector', 'emb_dict.pkl', '/tmp/emb_dict.pkl')
+
+    emb_dict = load_file('/tmp/emb_dict.pkl')
     title_embedding = []
     for word in arr_title:
         if emb_dict.get(word) is None:
@@ -92,19 +107,6 @@ def process_input(title, body):
             body_embedding.append(empty_array)
 
     return title_embedding, body_embedding
-
-
-def download_blob(bucket_name, source_blob_name, destination_file_name):
-    """Downloads a blob from the bucket."""
-    storage_client = storage.Client()
-    bucket = storage_client.get_bucket(bucket_name)
-    blob = bucket.blob(source_blob_name)
-
-    blob.download_to_filename(destination_file_name)
-
-    print('Blob {} downloaded to {}.'.format(
-        source_blob_name,
-        destination_file_name))
 
 def nltk_test(inp):
     # looks like request.get_json() and the input.get_json() do the same thing
