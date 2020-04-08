@@ -1,6 +1,7 @@
 import numpy
 import tensorflow
 
+import tensorflow.keras.layers
 from google.cloud import storage
 from tensorflow.keras.layers import Dense, Flatten, Conv2D
 from tensorflow.keras import Model
@@ -41,8 +42,8 @@ class CustomModel(Model):
         x = layers.Dropout(.159)(x)
         output = layers.Dense(1, activation='sigmoid', name='output')(x)
 
-        model = Model(inputs=[title_inputs, body_inputs], outputs=[output], name='CNN_model')
-        model.compile(loss=BinaryCrossentropy(),
+        self.model = Model(inputs=[title_inputs, body_inputs], outputs=[output], name='CNN_model')
+        self.model.compile(loss=BinaryCrossentropy(),
                       optimizer='Adam',
                       metrics=['accuracy'])
 
@@ -66,12 +67,12 @@ def handler(request):
 
     # Model load which only happens during cold starts
     if model is None:
-        download_blob('cnn_model_inspector', 'cnn.ckpt', 'weights.ckpt')
-        model = CustomModel()
-        model.load_weights('weights.ckpt')
+        download_blob('cnn_model_inspector', 'cnn.ckpt', '/tmp/weights.ckpt')
+        model = CustomModel().model
+        model.load_weights('/tmp/weights.ckpt')
 
 
-    predictions = model.call(input)
+    predictions = model.predict(input)
     print(predictions)
     print("Article is "+class_names[numpy.argmax(predictions)])
 
