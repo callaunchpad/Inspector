@@ -9,7 +9,8 @@ import flask
 from flask import jsonify
 from flask import Flask
 from flask import request
-
+from os import path
+from nlp_tools import remove_punc
 app = Flask(__name__)
 
 model = None
@@ -94,6 +95,11 @@ def download_blob(bucket_name, source_blob_name, destination_file_name):
     print('Blob {} downloaded to {}.'.format(
         source_blob_name,
         destination_file_name))
+
+def nltk_test(inp):
+    print(request.get_json())
+    print(inp.get_json())
+    print(remove_punc("this, is some sample text."))
 
 def handler(input):
     global model
