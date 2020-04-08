@@ -1,16 +1,18 @@
-import numpy
+import numpy as np
 import tensorflow
 
 import tensorflow.keras.layers
 from google.cloud import storage
 from tensorflow.keras.layers import Dense, Flatten, Conv2D
 from tensorflow.keras import Model
+from tensorflow.keras.optimizers import SGD
+from tensorflow.keras.losses import BinaryCrossentropy
 import flask
 from flask import jsonify
 from flask import Flask
 from flask import request
 from os import path
-from nlp_tools import remove_punc, remove_stopwords, lemmatize
+from nlp_tools import remove_punc, remove_stopwords, lemmatize, load_file
 app = Flask(__name__)
 
 model = None
@@ -87,7 +89,7 @@ class CustomModel(Model):
                 body_embedding = body_embedding[:500]
             elif len(body_embedding) < 500:
                 while len(body_embedding) < 500:
-                    body_embeddings.append(empty_array)
+                    body_embedding.append(empty_array)
 
             return title_embedding, body_embedding
 
@@ -120,7 +122,6 @@ def handler(request):
     input = [0, 0]
     input[0], input[1] = process_input(content['title'], content['body'])
     class_names = [0, 1]
-
 
     # Model load which only happens during cold starts
     if model is None:
