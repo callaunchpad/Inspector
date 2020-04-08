@@ -53,10 +53,18 @@ class CustomModel(Model):
                       metrics=['accuracy'])
 
         def process_input(title, body):
+            arr_title = remove_punc(title)
+            arr_title = remove_stopwords(arr_title)
+            arr_title = lemmatize(arr_title)
+
+            arr_body = remove_punc(body)
+            arr_body = remove_stopwords(arr_body)
+            arr_body = lemmatize(arr_body)
+
             empty_array = np.array([0]*50)
             emb_dict = load_file(emb_file)
             title_embedding = []
-            for word in title:
+            for word in arr_title:
                 if emb_dict.get(word) is None:
                     title_embedding.append(emb_dict.get('unk')) # POTENTIALLY CHANGE WHAT TO APPEND
                 else:
@@ -68,7 +76,7 @@ class CustomModel(Model):
                     title_embedding.append(empty_array)
 
             body_embedding = []
-            for word in body:
+            for word in arr_body:
                 # if the word is OOV, append the unk vector
                 if emb_dict.get(word) is None:
                     body_embedding.append(emb_dict.get('unk')) # POTENTIALLY CHANGE WHAT TO APPEND
@@ -106,7 +114,7 @@ def nltk_test(inp):
     arr = lemmatize(arr)
     print(arr)
 
-def handler(input):
+def handler(request):
     global model
     content = request.get_json()
     input = [0, 0]
