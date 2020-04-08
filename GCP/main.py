@@ -132,6 +132,6 @@ def handler(request):
 
     predictions = model.predict(input)
     print(predictions)
-    print("Article is "+class_names[numpy.argmax(predictions)])
+    print("Article is "+class_names[np.argmax(predictions)])
 
-    return jsonify(class_names[numpy.argmax(predictions)])
+    return jsonify(class_names[np.argmax(predictions)])
