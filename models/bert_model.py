@@ -40,7 +40,7 @@ model.compile(
 )
 
 # Train the model
-checkpoint = ModelCheckpoint("./Bert_saves/bert.ckpt", monitor='loss', verbose=1,
+checkpoint = ModelCheckpoint("./Bert_saves/bert.ckpt", monitor='val_loss', verbose=1,
     save_best_only=True, save_weights_only=False, mode='auto', period=1)
 
 model.fit(
