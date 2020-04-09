@@ -1,4 +1,6 @@
-Folder with BERT checkpoint saves
-
-training accuracy: 97%
-test accuracy: 95%
+Train accuracy: 97%
+Test loss: 0.5072707927389015
+Test accuracy: 0.9588329
+true positive (fake): 0.9585758301951387
+true positive (real): 0.9591934709553529
+time: 0.20063233375549316
