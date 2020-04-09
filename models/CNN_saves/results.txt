@@ -1,0 +1,6 @@
+Test loss: 0.2204006453402799
+Test accuracy: 0.9138689
+Training accuracy: .93
+true positive (fake): 0.9142952795446937
+true positive (real): 0.9132374814080317
+time elapsed on CSUA GPU: 0.03684878349304199
