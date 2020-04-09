@@ -1,14 +1,10 @@
-const path = require('path');
+var path = require('path');
 
 module.exports = {
+  mode: 'development',
   entry: './src/content.js',
   output: {
-    filename: 'main.js',
-    path: path.resolve(__dirname, 'dist'),
-  },
-  module: {
-    loaders: [
-      { test: /\.css$/, loader: 'style-loader!css-loader' },
-    ]
+    path: path.resolve(__dirname, './src/dist'),
+    filename: 'content.bundle.js'
   }
 };

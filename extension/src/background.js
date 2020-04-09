@@ -9,10 +9,14 @@ chrome.browserAction.onClicked.addListener((tab) => {
     console.log("sending request...")
     // tab param has info about the tab you're on
 
-    // sending message to content.js
-    let message = { msg: SEND_REQUEST }
-    chrome.tabs.sendMessage(tab.id, message)
-    // make query to GCP and stuff
+    // sending message to content.js for it to handle stuff
+    chrome.tabs.query({active: true, lastFocusedWindow: true}, (tabs) => {
+        let message = {
+            msg: SEND_REQUEST,
+            url: tabs[0].url
+        }
+        chrome.tabs.sendMessage(tab.id, message)
+    });
 });
 
 console.log("added listener")
