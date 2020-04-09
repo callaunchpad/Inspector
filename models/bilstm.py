@@ -8,7 +8,6 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.callbacks import ModelCheckpoint
 from fn1data import fn1data
-from testData import DataSet
 
 # GPU stuff
 # global boolean for using GPU or not
