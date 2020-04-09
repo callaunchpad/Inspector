@@ -44,8 +44,11 @@ def create_cnn():
     x = layers.Dense(40)(x)
     x = layers.Dropout(.159)(x)
     output = layers.Dense(1, activation='sigmoid', name='output')(x)
-
-    return Model(inputs=[title_inputs, body_inputs], outputs=[output], name='CNN_model')
+    model =  Model(inputs=[title_inputs, body_inputs], outputs=[output], name='CNN_model')
+    model.compile(loss=BinaryCrossentropy(),
+              optimizer='Adam',
+              metrics=['accuracy'])
+    return model
 
 model = create_cnn()
 model.load_weights(checkpoint_path)
@@ -55,20 +58,22 @@ results = model.evaluate([test_title, test_body], y=test_labels, verbose=2)
 print('Test loss:', results[0])
 print('Test accuracy:', results[1])
 
-predictions = model.predict([test_title, test_body])
+predictions = model.predict([test_title, test_body]).flatten()
 # 1 means real, 0 means fake
 
 # calculate true positive % i.e of the total number of fake articles, how many were predicted fake
-tp = np.sum (predictions == test_labels and predictions == 0)
+num_tp = np.sum([1 for pred, lab in zip(predictions, test_labels) if round(pred) == lab and lab == 0])
+tp = num_tp / (len(test_labels) - np.count_nonzero(test_labels))
 
 # calculate true negative % i.e of the total number of real articles, how many were predicted real
-tn = np.sum (predictions == test_labels and predictions == 1)
+num_tn = np.sum([1 for pred, lab in zip(predictions, test_labels) if round(pred) == lab and lab == 1])
+tn = num_tn / np.count_nonzero(test_labels)
 
 print("true positive (fake): {0}".format(tp))
 print("true positive (real): {0}".format(tn))
 
 # time for predicting 1 sample point
 start = time.time()
-predictions = model.predict([test_title[0], test_body[0]])
+predictions = model.predict([[test_title[0]], [test_body[0]]])
 end = time.time()
 print("time elapsed on CSUA GPU: {0}".format(end - start))
