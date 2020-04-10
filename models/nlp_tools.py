@@ -7,7 +7,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
 from nltk.stem import WordNetLemmatizer
 from nltk.stem.porter import PorterStemmer
-
+nltk.data.path.append('./nltk_data')
 # nltk.download()
 
 lemmatizer = WordNetLemmatizer()

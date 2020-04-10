@@ -22,10 +22,10 @@ function getBody() {
 }
 
 function sendRequest() {
-    // Code here
+    // Import Billy and Zach's code here
     if (!titleText || !bodyText) {
         alert("please highlight the article title and body text first");
     }
 }
 
-document.getElementById('sendRequest').addEventListener('click', sendRequest);
+document.getElementById('button').addEventListener('click', sendRequest);
