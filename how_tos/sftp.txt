@@ -11,10 +11,9 @@ in the remote machine with Cyberduck and edit those files.
 Cyberduck:
 Download cyberduck: https://cyberduck.io/download/
     - click on open connection
-    - to access OCF HPCs, enter hpcctl.ocf.berkeley.edu into the server field
+    - to access CUSA HPCs, enter latte.csua.berkeley.edu into the server field
     - port number should be 22
-    - username is whatever OCF username you registered as
-    - same goes for password
+    - username is dshau22 and password is !nspectorBCDDMZ
     - click on allow for any messages that pop up about fingerprints or keys
     - You can also edit files remotely using an IDE/text editor you've installed locally
         - Open Cyberduck and go to Preferences (after clicking 
