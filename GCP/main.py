@@ -8,10 +8,9 @@ from tensorflow.keras import Model
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.losses import BinaryCrossentropy
 import flask
-from flask import jsonify
-from flask import Flask
-from flask import request
+from flask import jsonify, make_response, Flask, request
 from os import path
+import json
 from nlp_tools import remove_punc, remove_stopwords, lemmatize, load_file
 app = Flask(__name__)
 
@@ -145,6 +144,11 @@ def handler(request):
     print(predictions)
     print("Article is ", np.round(predictions[0][0]) )
 
-    final_result = {'result': str(np.round(predictions[0][0]))}
-
-    return jsonify(final_result)
+    final_result = { 'result': str(np.round(predictions[0][0])) }
+    json_result = jsonify(probability=str(predictions[0][0]),
+                          pred_class=str(np.round(predictions[0][0])))
+    # print(json_result)
+    # response = make_response(json_result)
+    # print(response)
+    # print(json.dumps(final_result), 200, {'Content-Type': 'application/json'})
+    return json_result

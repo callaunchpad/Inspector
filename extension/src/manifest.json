@@ -11,11 +11,11 @@
     "content_scripts": [
         {
             "matches": ["<all_urls>"],
-            "js": ["./dist/content.bundle.js"]
+            "js": ["content.js"]
         }
     ],
     "background": {
-        "scripts": ["background.js"]
+        "scripts": ["./dist/background.bundle.js"]
     },
     "browser_action": {
         "default_icon": "icon.png"
