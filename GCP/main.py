@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow
 
-import tensorflow.keras.layers
+import tensorflow.keras.layers as layers
 from google.cloud import storage
 from tensorflow.keras.layers import Dense, Flatten, Conv2D
 from tensorflow.keras import Model
@@ -17,7 +17,7 @@ app = Flask(__name__)
 
 model = None
 
-class CustomModel(Model):
+class CustomModel():
     def __init__(self):
         embedding_size = 50
 
@@ -77,9 +77,16 @@ def process_input(title, body):
 
     empty_array = np.array([0]*50)
 
+    print('pre_download_blob...')
+
     download_blob('cnn_model_inspector', 'emb_dict.pkl', '/tmp/emb_dict.pkl')
 
+    print('post_download_blob...')
+
     emb_dict = load_file('/tmp/emb_dict.pkl')
+
+    print('emb_dict loaded!')
+
     title_embedding = []
     for word in arr_title:
         if emb_dict.get(word) is None:
@@ -119,21 +126,25 @@ def nltk_test(inp):
     print(arr)
 
 def handler(request):
+    print("beginning...")
     global model
     content = request.get_json()
-    input = [0, 0]
-    input[0], input[1] = process_input(content['title'], content['body'])
-    class_names = [0, 1]
+    print('requested json: ', content)
+    inputs = [0, 0]
+    inputs[0], inputs[1] = process_input(content['title'], content['body'])
+    print('inputs set up...')
 
     # Model load which only happens during cold starts
     if model is None:
         download_blob('cnn_model_inspector', 'cnn.ckpt', '/tmp/weights.ckpt')
         model = CustomModel().model
         model.load_weights('/tmp/weights.ckpt')
+        print('model loaded...')
 
-
-    predictions = model.predict(input)
+    predictions = model.predict([[inputs[0]], [inputs[1]]])
     print(predictions)
-    print("Article is "+class_names[np.argmax(predictions)])
+    print("Article is ", np.round(predictions[0][0]) )
 
-    return jsonify(class_names[np.argmax(predictions)])
+    final_result = {'result': str(np.round(predictions[0][0]))}
+
+    return jsonify(final_result)
