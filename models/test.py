@@ -59,7 +59,11 @@ x = layers.Dense(40)(x)
 x = layers.Dropout(.159)(x)
 output = layers.Dense(1, activation='sigmoid', name='output')(x)
 
+<<<<<<< HEAD
 checkpoint = ModelCheckpoint("./CNN_saves/cnn.ckpt", monitor='val_acc', verbose=1,
+=======
+checkpoint = ModelCheckpoint("./CNN_saves/cnn.ckpt", monitor='loss', verbose=1,
+>>>>>>> extension
     save_best_only=True, save_weights_only=False, mode='auto', period=1)
 
 model = Model(inputs=[title_inputs, body_inputs], outputs=[output], name='CNN_model')
@@ -72,7 +76,11 @@ print("begin training... \n")
 history = model.fit([train_title, train_body],
                     train_labels,
                     batch_size=32,
+<<<<<<< HEAD
                     epochs=3,
+=======
+                    epochs=4,
+>>>>>>> extension
                     validation_split=0.3,
                     shuffle=True,
                     callbacks=[checkpoint])

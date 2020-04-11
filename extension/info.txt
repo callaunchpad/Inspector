@@ -1,0 +1,12 @@
+File descriptions:
+
+    icon.png: 19px x 19px icon. This is what's displayed on the browser
+    icon_48.png: 48px x 48px icon used in extensions management page
+    icon_128.png: 128px x 128px icon. Icon that's shown on the chrome store
+    manifest.json: format specified here: https://developer.chrome.com/extensions/manifest. 
+        Provides info about extension
+    images/: directory that contains images used in the extension html
+    popup.html: html code for the extension. Defines what's shown when you click the extension icon on the browser
+    popup.css: styles the extension html to look pretty
+    popup.js: actual functions that send requests to our GCP server
+

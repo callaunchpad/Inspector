@@ -1,0 +1,36 @@
+// if we wanna make this automatic after clicking icon, put javascript here for automatic processing
+// https://www.youtube.com/watch?v=ew9ut7ixIlI
+var SEND_REQUEST = "send request"
+let SERVER_ENDPOINT = 'https://us-central1-inspector-project.cloudfunctions.net/handler';
+var request_body = {'title': 'Coronavirus Live Updates: As Economy Hemorrhages Jobs, Europeans Agree to Prime E.U.’s Pump - The New York Times',
+                'body': 'I hate monkeys. I just want cookies.'};
+console.log("backgroud running");
+
+import Mercury from '@postlight/mercury-parser';
+import inference from './posts.js'
+
+chrome.browserAction.onClicked.addListener(async (tab) => {
+    // remove "default_popup": "popup.html" from manifest for this to work
+    console.log("sending request...")
+    // tab param has info about the tab you're on
+
+    // sending message to content.js for it to handle stuff
+    chrome.tabs.query({active: true, lastFocusedWindow: true}, async (tabs) => {
+        // why do they still use callbacks kill me
+        let url = tabs[0].url;
+        console.log("url: ", url);
+
+        // get webpage information with the Mercury package
+        var webpage_info = await Mercury.parse(url);
+
+        // remove html tags with regex
+        let article_body = webpage_info.content.replace( /(<([^>]+)>)/ig, '');
+        let article_title = webpage_info.title;
+        console.log("title: ", article_title);
+        console.log("body: ", article_body);
+
+        let model_result = await inference(article_title, article_body);
+        let message = { model_result };
+        chrome.tabs.sendMessage(tab.id, message)
+    });
+});
