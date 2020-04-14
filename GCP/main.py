@@ -12,9 +12,20 @@ from flask import jsonify, make_response, Flask, request
 from os import path
 import json
 from nlp_tools import remove_punc, remove_stopwords, lemmatize, load_file
+
+#### BILSTM Imports
+from tensorflow import keras
+from tensorflow.keras.layers import Dropout, LSTM, Bidirectional, Concatenate
+from tensorflow.keras.datasets import imdb
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.losses import SparseCategoricalCrossentropy
+from search import search
+
+
 app = Flask(__name__)
 
-model = None
+cnn = None
+BiLSTM = None
 
 class CustomModel():
     def __init__(self):
@@ -48,10 +59,46 @@ class CustomModel():
         x = layers.Dropout(.159)(x)
         output = layers.Dense(1, activation='sigmoid', name='output')(x)
 
-        self.model = Model(inputs=[title_inputs, body_inputs], outputs=[output], name='CNN_model')
-        self.model.compile(loss=BinaryCrossentropy(),
+        self.cnn = Model(inputs=[title_inputs, body_inputs], outputs=[output], name='CNN_model')
+        self.cnn.compile(loss=BinaryCrossentropy(),
                       optimizer='Adam',
                       metrics=['accuracy'])
+
+
+        ##### Create BILSTM
+        embedding_size = 50
+        num_title_embeddings = 15
+        num_body_embeddings = 40
+
+        # Create layers for model
+        input_title = keras.layers.Input(shape = (num_title_embeddings, embedding_size))
+
+        # BiLSTM layer that reads in a title input
+        flayer_title = LSTM(60, return_state=True)
+        blayer_title = LSTM(60, return_state=True, go_backwards=True)
+        lstm_title, fh_title, fc_title, bh_title, bc_title = Bidirectional(flayer_title, backward_layer=blayer_title)(input_title)
+
+        input_body = keras.layers.Input(shape = (num_body_embeddings, embedding_size))
+
+        # BiLSTM layer that reads in a body input and uses the previous layer's output as initial states
+        flayer_body = LSTM(60, return_state=True)
+        blayer_body = LSTM(60, return_state=True, go_backwards=True)
+        lstm_body, fh_body, fc_body, bh_body, bc_body = Bidirectional(flayer_body, backward_layer=blayer_body)\
+            (input_body, initial_state=[fh_title, fc_title, bh_title, bc_title])
+
+        # Dense, Dropout and Dense (out) layers
+        dense1 = Dense(128, activation='relu')(keras.layers.average([fh_body, bh_body]))
+        dropout1 = Dropout(1e-3)(dense1)
+        dense2 = Dense(64, activation='relu')(dropout1)
+        dropout2 = Dropout(1e-3)(dense2)
+        output = Dense(4, activation='softmax')(dropout2)
+
+        self.lstm = Model(inputs=[input_title, input_body], outputs=[output], name='BiLSTM_Model')
+
+        self.lstm.compile(loss=SparseCategoricalCrossentropy(),
+                      optimizer=Adam(learning_rate=1e-3),
+                      metrics=['accuracy'])
+
 
 def download_blob(bucket_name, source_blob_name, destination_file_name):
     """Downloads a blob from the bucket."""
@@ -134,19 +181,25 @@ def handler(request):
     print('inputs set up...')
 
     # Model load which only happens during cold starts
-    if model is None:
+    if cnn is None:
         download_blob('cnn_model_inspector', 'cnn.ckpt', '/tmp/weights.ckpt')
-        model = CustomModel().model
-        model.load_weights('/tmp/weights.ckpt')
+        cnn = CustomModel().cnn
+        cnn.load_weights('/tmp/weights.ckpt')
         print('model loaded...')
 
-    predictions = model.predict([[inputs[0]], [inputs[1]]])
-    print(predictions)
-    print("Article is ", np.round(predictions[0][0]) )
+    if BiLSTM is None:
+        download_blob('cnn_model_inspector', 'lstm.ckpt', '/tmp/lstmweights.ckpt')
+        lstm = CustomModel().lstm
+        lstm.load_weights('/tmp/lstmweights.ckpt')
+        print('model loaded...')
 
-    final_result = { 'result': str(np.round(predictions[0][0])) }
-    json_result = jsonify(probability=str(predictions[0][0]),
-                          pred_class=str(np.round(predictions[0][0])))
+    cnn_predictions = cnn.predict([[inputs[0]], [inputs[1]]])
+    print(cnn_predictions)
+    print("Article is ", np.round(cnn_predictions[0][0]) )
+
+    final_result = { 'result': str(np.round(cnn_predictions[0][0])) }
+    json_result = jsonify(probability=str(cnn_predictions[0][0]),
+                          pred_class=str(np.round(cnn_predictions[0][0])))
     # print(json_result)
     # response = make_response(json_result)
     # print(response)
