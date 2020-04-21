@@ -69,12 +69,27 @@ checkpoint = ModelCheckpoint("./LSTM_saves/lstm.ckpt", monitor='val_acc', verbos
     save_best_only=True, save_weights_only=False, mode='auto', period=1)
 
 print("Training model on data")
+
+# Add class weights to make training better
+num_labels = [0, 0, 0, 0]
+total = 0
+for label in train_labels:
+    num_labels[label] += 1
+    total += 1
+    
+weight_for_unrelated = (1 / num_labels[0])*(total)/2.0
+weight_for_discuss = (1 / num_labels[1])*(total)/2.0
+weight_for_agree = (1 / num_labels[2])*(total)/2.0
+weight_for_disagree = (1 / num_labels[3])*(total)/2.0
+class_weight = {0: weight_for_unrelated, 1: weight_for_discuss, 2: weight_for_agree, 3: weight_for_disagree}
+
 history = model.fit([train_title, train_body],
                     train_labels,
                     batch_size=32,
                     epochs=20,
                     shuffle=True,
                     validation_split=0.3,
+                    class_weight=class_weight,
                     callbacks=[checkpoint])
 
 print("Evaluating model on data")
