@@ -7,6 +7,7 @@ from loader import load_data
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.losses import BinaryCrossentropy
 from tensorflow.keras import layers
+from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.models import Model
 
 print("loading data...\n")
@@ -17,29 +18,25 @@ print("loaded data!")
 
 ### TITLE BRANCH ###
 
+print(np.shape(test_labels))
+
 embedding_size = 50
 
-# should be individual input sizes, not total number of inputs
-title_size = len(train_title)
+title_inputs = layers.Input(shape=(13, embedding_size), name='title')
 
-title_inputs = layers.Input(shape=(title_size, ), name='title')
-
-x = layers.Conv1D(8, title_size, activation='relu')(title_inputs)
-x = layers.MaxPool1D(4)(x)
+x = layers.Conv1D(8, 6, activation='relu', input_shape=(13, embedding_size))(title_inputs)
+x = layers.MaxPool1D(pool_size=4)(x)
 x = layers.Flatten()(x)
 title_outputs = layers.Dense(6, activation='relu')(x)
 
 ### TEXT BRANCH ###
 
-# should be individual input sizes, not total number of inputs
-body_size = len(train_body)
+body_inputs = layers.Input(shape=(500, embedding_size), name='body')
 
-body_inputs = layers.Input(shape=(body_size, ), name='body')
-
-x = layers.Conv1D(42, body_size, activation='relu')(body_inputs)
-x = layers.MaxPool1D(4)(x)
-x = layers.Flatten()(x)
-body_outputs = layers.Dense(34, activation='relu')(x)
+y = layers.Conv1D(42, 200, activation='relu', input_shape=(500, embedding_size))(body_inputs)
+y = layers.MaxPool1D(pool_size=4)(y)
+y = layers.Flatten()(y)
+body_outputs = layers.Dense(34, activation='relu')(y)
 
 ### CONCATENATE ###
 
@@ -51,22 +48,27 @@ x = layers.Dense(40)(x)
 x = layers.Dropout(.11)(x)
 x = layers.Dense(40)(x)
 x = layers.Dropout(.159)(x)
-output = layers.Dense(2, name='output')(x)
+output = layers.Dense(1, activation='sigmoid', name='output')(x)
+
+checkpoint = ModelCheckpoint("./CNN_saves/cnn.ckpt", monitor='loss', verbose=1,
+    save_best_only=True, save_weights_only=False, mode='auto', period=1)
 
 model = Model(inputs=[title_inputs, body_inputs], outputs=[output], name='CNN_model')
 
 model.compile(loss=BinaryCrossentropy(),
-              optimizer=SGD(),
+              optimizer='Adam',
               metrics=['accuracy'])
 
 print("begin training... \n")
-history = model.fit({'title': train_title, 'body': train_body},
-                    {'output': train_labels},
+history = model.fit([train_title, train_body],
+                    train_labels,
                     batch_size=32,
                     epochs=4,
-                    validation_split=0.3)
+                    validation_split=0.3,
+                    shuffle=True,
+                    callbacks=[checkpoint])
 
-test_scores = model.evaluate([test_title, test_body], test_labels, verbose=2)
+test_scores = model.evaluate([test_title, test_body], y=test_labels, verbose=2)
 print('Test loss:', test_scores[0])
 print('Test accuracy:', test_scores[1])
 
