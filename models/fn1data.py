@@ -12,7 +12,7 @@ import os
 # num_title_embeddings = 13
 # num_body_embeddings = 500
 num_title_embeddings = 15
-num_body_embeddings = 40
+num_body_embeddings = 45
 
 FIELDNAMES = ['Headline', 'Body ID', 'Stance']
 emb_file = 'emb_dict.pkl'

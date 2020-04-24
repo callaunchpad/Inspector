@@ -23,7 +23,7 @@ embedding_size = 50
 # num_title_embeddings = 13
 # num_body_embeddings = 500
 num_title_embeddings = 15
-num_body_embeddings = 40
+num_body_embeddings = 45
 
 data = fn1data()
 train_title = data.train_titles

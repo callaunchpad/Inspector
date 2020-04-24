@@ -22,7 +22,7 @@ embedding_size = 50
 # num_title_embeddings = 13
 # num_body_embeddings = 500
 num_title_embeddings = 15
-num_body_embeddings = 40
+num_body_embeddings = 45
 
 data = fn1data()
 train_title = data.train_titles
@@ -52,12 +52,13 @@ blayer_body = LSTM(60, return_state=True, go_backwards=True)
 lstm_body, fh_body, fc_body, bh_body, bc_body = Bidirectional(flayer_body, backward_layer=blayer_body)\
     (input_body, initial_state=[fh_title, fc_title, bh_title, bc_title])
 
-# Dense, Dropout and Dense (out) layers
-dense1 = Dense(128, activation='relu')(keras.layers.average([fh_body, bh_body]))
-dropout1 = Dropout(1e-3)(dense1)
-dense2 = Dense(64, activation='relu')(dropout1)
-dropout2 = Dropout(1e-3)(dense2)
-output = Dense(4, activation='softmax')(dropout2)
+### Dense, Dropout and Dense (out) layers
+# dense1 = Dense(128, activation='relu')(keras.layers.average([fh_body, bh_body]))
+# dropout1 = Dropout(1e-3)(dense1)
+# dense2 = Dense(64, activation='relu')(dropout1)
+# dropout2 = Dropout(1e-3)(dense2)
+# output = Dense(4, activation='softmax')(dropout2)
+output = Dense(4, activation='softmax')(keras.layers.average([fh_body, bh_body]))
 
 model = Model(inputs=[input_title, input_body], outputs=[output], name='BiLSTM_Model')
 
@@ -69,8 +70,7 @@ checkpoint = ModelCheckpoint("./LSTM_saves/lstm.ckpt", monitor='val_acc', verbos
     save_best_only=True, save_weights_only=False, mode='auto', period=1)
 
 print("Training model on data")
-history = model.fit([train_title, train_body],
-                    train_labels,
+history = model.fit([train_title, train_body], train_labels,
                     batch_size=32,
                     epochs=20,
                     shuffle=True,
