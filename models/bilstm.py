@@ -66,7 +66,7 @@ model.compile(loss=SparseCategoricalCrossentropy(),
               optimizer=Adam(learning_rate=1e-3),
               metrics=['accuracy'])
 
-checkpoint = ModelCheckpoint("./LSTM_saves/lstm.ckpt", monitor='val_acc', verbose=1,
+checkpoint = ModelCheckpoint("./LSTM_saves/lstm_smax.ckpt", monitor='val_acc', verbose=1,
     save_best_only=True, save_weights_only=False, mode='auto', period=1)
 
 print("Training model on data")
