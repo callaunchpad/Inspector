@@ -8,6 +8,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.callbacks import ModelCheckpoint
 from fn1data import fn1data
+from sklearn.utils import class_weight
 
 # GPU stuff
 # global boolean for using GPU or not
@@ -84,13 +85,17 @@ print("Training model on data")
 #weight_for_disagree = (1 / num_labels[3])*(total)/2.0
 #class_weight = {0: weight_for_unrelated, 1: weight_for_discuss, 2: weight_for_agree, 3: weight_for_disagree}
 
+class_weights = class_weight.compute_class_weight('balanced',
+                                                 np.unique(train_labels),
+                                                 train_labels)
+
 history = model.fit([train_title, train_body],
                     train_labels,
                     batch_size=32,
                     epochs=20,
                     shuffle=True,
                     validation_split=0.3,
-#                    class_weight=class_weight,
+                    class_weight=class_weights,
                     callbacks=[checkpoint])
 
 print("Evaluating model on data")
