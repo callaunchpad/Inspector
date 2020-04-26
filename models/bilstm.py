@@ -33,6 +33,25 @@ test_title = data.test_titles
 test_body = data.test_bodies
 test_labels = data.test_labels
 
+# Add class weights to make training better
+num_labels = [0, 0, 0, 0]
+total = 0
+for label in train_labels:
+    num_labels[label] += 1
+    total += 1
+    
+weight_for_unrelated = (1.0 / num_labels[0])*(total)
+weight_for_discuss = (1.0 / num_labels[1])*(total)
+weight_for_agree = (1.0 / num_labels[2])*(total)
+weight_for_disagree = (1.0 / num_labels[3])*(total)
+class_weights = {0: weight_for_unrelated, 1: weight_for_discuss, 2: weight_for_agree, 3: weight_for_disagree}
+print(class_weights)
+
+class_weights2 = class_weight.compute_class_weight('balanced',
+                                                 np.unique(train_labels),
+                                                 train_labels)
+print(class_weights2)
+
 print('title length:', len(train_title))
 
 print('body length:', len(train_body))
@@ -71,23 +90,6 @@ checkpoint = ModelCheckpoint("./LSTM_saves/lstm_smax.ckpt", monitor='val_acc', v
     save_best_only=True, save_weights_only=False, mode='auto', period=1)
 
 print("Training model on data")
-
-# Add class weights to make training better
-#num_labels = [0, 0, 0, 0]
-#total = 0
-#for label in train_labels:
-#    num_labels[label] += 1
-#    total += 1
-    
-#weight_for_unrelated = (1 / num_labels[0])*(total)/2.0
-#weight_for_discuss = (1 / num_labels[1])*(total)/2.0
-#weight_for_agree = (1 / num_labels[2])*(total)/2.0
-#weight_for_disagree = (1 / num_labels[3])*(total)/2.0
-#class_weight = {0: weight_for_unrelated, 1: weight_for_discuss, 2: weight_for_agree, 3: weight_for_disagree}
-
-class_weights = class_weight.compute_class_weight('balanced',
-                                                 np.unique(train_labels),
-                                                 train_labels)
 
 history = model.fit([train_title, train_body],
                     train_labels,
