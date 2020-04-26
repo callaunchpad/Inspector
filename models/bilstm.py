@@ -93,7 +93,7 @@ print("Training model on data")
 
 history = model.fit([train_title, train_body],
                     train_labels,
-                    batch_size=20,
+                    batch_size=50,
                     epochs=20,
                     shuffle=True,
                     validation_split=0.3,
