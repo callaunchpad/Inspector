@@ -40,10 +40,10 @@ for label in train_labels:
     num_labels[label] += 1
     total += 1
     
-weight_for_unrelated = (1.0 / num_labels[0])*(total)/2.0
-weight_for_discuss = (1.0 / num_labels[1])*(total)/2.0
-weight_for_agree = (1.0 / num_labels[2])*(total)/2.0
-weight_for_disagree = (1.0 / num_labels[3])*(total)/2.0
+weight_for_unrelated = (1.0 / num_labels[0])*(total)
+weight_for_discuss = (1.0 / num_labels[1])*(total)
+weight_for_agree = (1.0 / num_labels[2])*(total)
+weight_for_disagree = (1.0 / num_labels[3])*(total)
 class_weights = {0: weight_for_unrelated, 1: weight_for_discuss, 2: weight_for_agree, 3: weight_for_disagree}
 print(class_weights)
 
@@ -60,15 +60,15 @@ print('body length:', len(train_body))
 input_title = keras.layers.Input(shape = (num_title_embeddings, embedding_size))
 
 # BiLSTM layer that reads in a title input
-flayer_title = LSTM(50, return_state=True)
-blayer_title = LSTM(50, return_state=True, go_backwards=True)
+flayer_title = LSTM(40, return_state=True)
+blayer_title = LSTM(40, return_state=True, go_backwards=True)
 lstm_title, fh_title, fc_title, bh_title, bc_title = Bidirectional(flayer_title, backward_layer=blayer_title)(input_title)
 
 input_body = keras.layers.Input(shape = (num_body_embeddings, embedding_size))
 
 # BiLSTM layer that reads in a body input and uses the previous layer's output as initial states
-flayer_body = LSTM(50, return_state=True)
-blayer_body = LSTM(50, return_state=True, go_backwards=True)
+flayer_body = LSTM(40, return_state=True)
+blayer_body = LSTM(40, return_state=True, go_backwards=True)
 lstm_body, fh_body, fc_body, bh_body, bc_body = Bidirectional(flayer_body, backward_layer=blayer_body)\
     (input_body, initial_state=[fh_title, fc_title, bh_title, bc_title])
 
@@ -93,7 +93,7 @@ print("Training model on data")
 
 history = model.fit([train_title, train_body],
                     train_labels,
-                    batch_size=25,
+                    batch_size=20,
                     epochs=20,
                     shuffle=True,
                     validation_split=0.3,
