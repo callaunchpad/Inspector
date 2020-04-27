@@ -65,7 +65,7 @@ def create_bilstm():
     model = Model(inputs=[input_title, input_body], outputs=[output], name='BiLSTM_Model')
 
     model.compile(loss=SparseCategoricalCrossentropy(),
-                optimizer=Adam(learning_rate=5e-2),
+                optimizer=Adam(learning_rate=5e-3),
                 metrics=['accuracy'])
     return model
 
