@@ -33,7 +33,7 @@ chrome.browserAction.onClicked.addListener(async (tab) => {
         let model_result = await inference(article_title, article_body);
         let message = { model_result };
 
-        chrome.windows.create({url: "http://www.google.com/"});
+        chrome.windows.create({url: "display.html", type: "popup", height: 400, width: 400});
 
         chrome.tabs.sendMessage(tab.id, message)
     });
