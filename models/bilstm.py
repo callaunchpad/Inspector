@@ -78,12 +78,13 @@ lstm_body, fh_body, fc_body, bh_body, bc_body = Bidirectional(flayer_body, backw
 # dense2 = Dense(64, activation='relu')(dropout1)
 # dropout2 = Dropout(1e-3)(dense2)
 # output = Dense(4, activation='softmax')(dropout2)
-output = Dense(4, activation='softmax')(keras.layers.average([fh_body, bh_body]))
+dropout = Dropout(0.1)(keras.layers.average([fh_body, bh_body]))
+output = Dense(4, activation='softmax')(dropout)
 
 model = Model(inputs=[input_title, input_body], outputs=[output], name='BiLSTM_Model')
 
 model.compile(loss=SparseCategoricalCrossentropy(),
-              optimizer=Adam(learning_rate=1e-4),
+              optimizer=Adam(learning_rate=1e-3),
               metrics=['accuracy'])
 
 checkpoint = ModelCheckpoint("./LSTM_saves/lstm_smax.ckpt", monitor='val_acc', verbose=1,
