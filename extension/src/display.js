@@ -7,5 +7,9 @@ try {
 // simplify the displayed URL in the address bar
 // history.replace({}, document.title, location.origin + location.pathname);
 
-document.getElementById('predicted class').textContent += sharedData.p_class;
+if (sharedData.p_class == 0) {
+    document.getElementById('predicted class').textContent += "real";
+} else {
+    document.getElementById('predicted class').textContent += "fake";
+}
 document.getElementById('score').textContent += sharedData.p_score;
