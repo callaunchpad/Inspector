@@ -9,6 +9,7 @@ console.log("backgroud running");
 import Mercury from '@postlight/mercury-parser';
 import inference from './posts.js'
 
+
 chrome.browserAction.onClicked.addListener(async (tab) => {
     // remove "default_popup": "popup.html" from manifest for this to work
     console.log("sending request...")
@@ -31,6 +32,9 @@ chrome.browserAction.onClicked.addListener(async (tab) => {
 
         let model_result = await inference(article_title, article_body);
         let message = { model_result };
+
+        chrome.windows.create({url: "http://www.google.com/"});
+
         chrome.tabs.sendMessage(tab.id, message)
     });
 });
