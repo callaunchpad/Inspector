@@ -60,8 +60,9 @@ def create_bilstm():
     # dense2 = Dense(64, activation='relu')(dropout1)
     # dropout2 = Dropout(1e-3)(dense2)
     # output = Dense(4, activation='softmax')(dropout2)
-    dropout = Dropout(0.1)(keras.layers.average([fh_body, bh_body]))
-    output = Dense(4, activation='softmax')(dropout)
+
+    # dropout = Dropout(0.1)(keras.layers.average([fh_body, bh_body]))
+    output = Dense(4, activation='softmax')(keras.layers.average([fh_body, bh_body]))
 
     model = Model(inputs=[input_title, input_body], outputs=[output], name='BiLSTM_Model')
 

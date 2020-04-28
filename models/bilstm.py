@@ -78,8 +78,9 @@ lstm_body, fh_body, fc_body, bh_body, bc_body = Bidirectional(flayer_body, backw
 # dense2 = Dense(64, activation='relu')(dropout1)
 # dropout2 = Dropout(1e-3)(dense2)
 # output = Dense(4, activation='softmax')(dropout2)
-dropout = Dropout(0.1)(keras.layers.average([fh_body, bh_body]))
-output = Dense(4, activation='softmax')(dropout)
+
+# dropout = Dropout(0.1)(keras.layers.average([fh_body, bh_body]))
+output = Dense(4, activation='softmax')(keras.layers.average([fh_body, bh_body]))
 
 model = Model(inputs=[input_title, input_body], outputs=[output], name='BiLSTM_Model')
 
@@ -95,7 +96,7 @@ print("Training model on data")
 history = model.fit([train_title, train_body],
                     train_labels,
                     batch_size=20,
-                    epochs=20,
+                    epochs=16,
                     shuffle=True,
                     validation_split=0.3,
                     class_weight=class_weights,
