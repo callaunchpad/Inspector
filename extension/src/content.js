@@ -7,5 +7,4 @@ chrome.runtime.onMessage.addListener(gotMessage);
 async function gotMessage(message, sender, sendResponse) {
     let { model_result } = message;
     let { pred_class, probability } = model_result;
-    alert("predicted class: " + pred_class + ", probability: " + probability);
 }
