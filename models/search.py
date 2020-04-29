@@ -98,5 +98,6 @@ def cosine_sim_matrices(text_embeddings, title_embeddings):
     return avg(text_similarity[1:]), avg(title_similarity[1:])
 
 def cos_sim_avgs(text_embeddings, title_embeddings):
-
+    return None
+    
 print(search("corona"))
