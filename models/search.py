@@ -14,7 +14,7 @@ def search(word):
     soup_page = soup(xml_page,"xml")
     news_list = soup_page.findAll("item")
 
-    arr_text_embeddings = []
+    arr_text_embeddings = [] #list of tuple(text_embeddings, article_link)
     arr_title_embeddings = []
     for i in range(4):
         text_embedding_tuple = get_text_embeddings(i)
@@ -23,9 +23,9 @@ def search(word):
         title_embedding_tuple = get_title_embeddings(i)
         arr_title_embeddings.append(title_embedding_tuple)
 
-    return arr_text_embeddings, arr_title_embeddings #list of tuple(text_embeddings, article_link)
+    return (arr_text_embeddings, arr_title_embeddings) 
 
-def get_text_embeddings(index)   
+def get_text_embeddings(index):
     article = news_list[index]
     article_link = article.link.text
 
@@ -38,9 +38,9 @@ def get_text_embeddings(index)
     article_text_parsed = parse_text(article_text)
     article_text_embeddings = word_embeddings(article_text_parsed)
 
-    return article_text_embeddings, article_link
+    return (article_text_embeddings, article_link)
 
-def get_title_embeddings(index)  
+def get_title_embeddings(index):
     article = news_list[index]
     article_link = article.link.text
 
@@ -51,7 +51,7 @@ def get_title_embeddings(index)
     title = soup.find('title')
     title_embeddings = word_embeddings(title)
 
-    return title_embeddings, article link
+    return (title_embeddings, article_link)
 
 def parse_text(text):
     no_punctuation = remove_punc(text)
@@ -76,8 +76,9 @@ def word_embeddings(text):
 
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
+import pandas as pd
 
-def cosine_sim(text_embeddings, title_embeddings):
+def cosine_sim_matrices(text_embeddings, title_embeddings):
     count_vectorizer = CountVectorizer()
     arr_text_embeddings, arr_title_embeddings = search(word)
     only_text_embeddings = []
@@ -95,5 +96,7 @@ def cosine_sim(text_embeddings, title_embeddings):
     title_similarity_matrix = cosine_similarity(title_sparse_matrix)
 
     return avg(text_similarity[1:]), avg(title_similarity[1:])
+
+def cos_sim_avgs(text_embeddings, title_embeddings):
 
 print(search("corona"))
