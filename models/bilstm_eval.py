@@ -71,7 +71,8 @@ def create_bilstm():
                 metrics=['accuracy'])
     return model
 
-checkpoint_path = "./LSTM_saves/lstm_smax.ckpt"
+
+checkpoint_path = "./LSTM_saves/lstm_best.ckpt"
 model = create_bilstm()
 model.load_weights(checkpoint_path)
 print("Evaluating model on data")
