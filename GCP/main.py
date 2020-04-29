@@ -25,7 +25,7 @@ from search import search
 app = Flask(__name__)
 
 cnn = None
-BiLSTM = None
+lstm = None
 
 class CustomModel():
     def __init__(self):
@@ -173,31 +173,46 @@ def nltk_test(inp):
 
 def handler(request):
     print("beginning...")
-    global model
+    global cnn, lstm
     content = request.get_json()
     print('requested json: ', content)
     inputs = [0, 0]
     inputs[0], inputs[1] = process_input(content['title'], content['body'])
+
+    lstm_articles = search(content['title']) #[(embedding, link)] of length 4
+    
     print('inputs set up...')
 
-    # Model load which only happens during cold starts
+    # cnn cache
     if cnn is None:
         download_blob('cnn_model_inspector', 'cnn.ckpt', '/tmp/weights.ckpt')
         cnn = CustomModel().cnn
         cnn.load_weights('/tmp/weights.ckpt')
-        print('model loaded...')
+        print('cnn model loaded...')
 
-    if BiLSTM is None:
+    cnn_predictions = cnn.predict([[inputs[0]], [inputs[1]]])
+    # print('CNN Predictions: ', cnn_predictions)
+
+    real_fake = {0: "Fake!", 1: "Real!"}
+    final_cnn_pred = real_fake[np.round(cnn_predictions[0][0])]
+
+    print("We predict the article is ", final_cnn_pred)
+
+    # lstm cache
+    if lstm is None:
         download_blob('cnn_model_inspector', 'lstm.ckpt', '/tmp/lstmweights.ckpt')
         lstm = CustomModel().lstm
         lstm.load_weights('/tmp/lstmweights.ckpt')
-        print('model loaded...')
+        print('bilstm model loaded...')
 
-    cnn_predictions = cnn.predict([[inputs[0]], [inputs[1]]])
-    print(cnn_predictions)
-    print("Article is ", np.round(cnn_predictions[0][0]) )
+    print("The top 4 related articles have the following stances: ")
+    for i in range(len(lstm_articles)):
+        article = lstm_articles[i]
+        lstm_prediction = lstm.predict([inputs[0]], [article[0]])
+        print("Article", i, "'s stance is:", lstm_prediction)
+        print("Article", i, "'s Link:", article[1])
 
-    final_result = { 'result': str(np.round(cnn_predictions[0][0])) }
+    final_result = { 'result': final_cnn_pred }
     json_result = jsonify(probability=str(cnn_predictions[0][0]),
                           pred_class=str(np.round(cnn_predictions[0][0])))
     # print(json_result)
