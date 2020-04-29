@@ -47,11 +47,6 @@ weight_for_disagree = (1.0 / num_labels[3])*(total)
 class_weights = {0: weight_for_unrelated, 1: weight_for_discuss, 2: weight_for_agree, 3: weight_for_disagree}
 print(class_weights)
 
-class_weights2 = class_weight.compute_class_weight('balanced',
-                                                 np.unique(train_labels),
-                                                 train_labels)
-print(class_weights2)
-
 print('title length:', len(train_title))
 
 print('body length:', len(train_body))
