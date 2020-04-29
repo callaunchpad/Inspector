@@ -179,7 +179,7 @@ def handler(request):
     inputs = [0, 0]
     inputs[0], inputs[1] = process_input(content['title'], content['body'])
 
-    lstm_articles = search(inputs[0]) #[(embedding, link)] of length 4
+    lstm_articles = search(content['title']) #[(embedding, link)] of length 4
     
     print('inputs set up...')
 
@@ -208,7 +208,7 @@ def handler(request):
     print("The top 4 related articles have the following stances: ")
     for i in range(len(lstm_articles)):
         article = lstm_articles[i]
-        lstm_prediction = lstm.predict([article[0][0]], [article[0][1]])
+        lstm_prediction = lstm.predict([inputs[0]], [article[0]])
         print("Article", i, "'s stance is:", lstm_prediction)
         print("Article", i, "'s Link:", article[1])
 
