@@ -72,7 +72,7 @@ def create_bilstm():
     return model
 
 
-checkpoint_path = "./LSTM_saves/lstm_best3.ckpt"
+checkpoint_path = "./LSTM_saves/lstm_best4.ckpt"
 model = create_bilstm()
 model.load_weights(checkpoint_path)
 print("Evaluating model on data")
