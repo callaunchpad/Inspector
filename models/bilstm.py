@@ -40,15 +40,15 @@ for label in train_labels:
     num_labels[label] += 1
     total += 1
     
-# weight_for_unrelated = (1.0 / num_labels[0])*(total)
-# weight_for_discuss = (1.0 / num_labels[1])*(total)
-# weight_for_agree = (1.0 / num_labels[2])*(total)
-# weight_for_disagree = (1.0 / num_labels[3])*(total)
+weight_for_unrelated = (2.0 / num_labels[0])*(total)
+weight_for_discuss = (2.0 / num_labels[1])*(total)
+weight_for_agree = (2.0 / num_labels[2])*(total)
+weight_for_disagree = (2.0 / num_labels[3])*(total)
 
-weight_for_unrelated = 1
-weight_for_discuss = 5
-weight_for_agree = 14
-weight_for_disagree = 60
+# weight_for_unrelated = 1
+# weight_for_discuss = 5
+# weight_for_agree = 14
+# weight_for_disagree = 60
 class_weights = {0: weight_for_unrelated, 1: weight_for_discuss, 2: weight_for_agree, 3: weight_for_disagree}
 print(class_weights)
 
@@ -88,7 +88,7 @@ model.compile(loss=SparseCategoricalCrossentropy(),
               optimizer=Adam(learning_rate=1e-3),
               metrics=['accuracy'])
 
-checkpoint = ModelCheckpoint("./LSTM_saves/lstm_best6.ckpt", monitor='val_acc', verbose=1,
+checkpoint = ModelCheckpoint("./LSTM_saves/lstm_best7.ckpt", monitor='val_acc', verbose=1,
     save_best_only=True, save_weights_only=False, mode='auto', period=1)
 
 print("Training model on data")
