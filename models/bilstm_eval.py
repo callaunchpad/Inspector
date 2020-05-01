@@ -20,8 +20,6 @@ if USE_GPU:
 
 # Load data
 embedding_size = 50
-# num_title_embeddings = 13
-# num_body_embeddings = 500
 num_title_embeddings = 15
 num_body_embeddings = 45
 
@@ -34,7 +32,6 @@ test_body = data.test_bodies
 test_labels = data.test_labels
 
 print('title length:', len(train_title))
-
 print('body length:', len(train_body))
 
 def create_bilstm():
@@ -54,14 +51,7 @@ def create_bilstm():
     lstm_body, fh_body, fc_body, bh_body, bc_body = Bidirectional(flayer_body, backward_layer=blayer_body)\
         (input_body, initial_state=[fh_title, fc_title, bh_title, bc_title])
 
-    ### Dense, Dropout and Dense (out) layers
-    # dense1 = Dense(128, activation='relu')(keras.layers.average([fh_body, bh_body]))
-    # dropout1 = Dropout(1e-3)(dense1)
-    # dense2 = Dense(64, activation='relu')(dropout1)
-    # dropout2 = Dropout(1e-3)(dense2)
-    # output = Dense(4, activation='softmax')(dropout2)
-
-    # dropout = Dropout(0.1)(keras.layers.average([fh_body, bh_body]))
+    # Final dense softmax layer
     output = Dense(4, activation='softmax')(keras.layers.average([fh_body, bh_body]))
 
     model = Model(inputs=[input_title, input_body], outputs=[output], name='BiLSTM_Model')
@@ -72,7 +62,7 @@ def create_bilstm():
     return model
 
 
-checkpoint_path = "./LSTM_saves/lstm_smax.ckpt"
+checkpoint_path = "./LSTM_saves/lstm_best.ckpt"
 model = create_bilstm()
 model.load_weights(checkpoint_path)
 print("Evaluating model on data")
@@ -105,4 +95,3 @@ start = time.time()
 predictions = model.predict([[test_title[0]], [test_body[0]]])
 end = time.time()
 print("time elapsed on CSUA GPU: {0}".format(end - start))
-

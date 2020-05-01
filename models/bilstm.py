@@ -1,14 +1,11 @@
-import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense, Dropout, LSTM, Bidirectional, Concatenate
-from tensorflow.keras.datasets import imdb
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.callbacks import ModelCheckpoint
 from fn1data import fn1data
-from sklearn.utils import class_weight
 
 # GPU stuff
 # global boolean for using GPU or not
@@ -20,8 +17,6 @@ if USE_GPU:
 
 # Load data
 embedding_size = 50
-# num_title_embeddings = 13
-# num_body_embeddings = 500
 num_title_embeddings = 15
 num_body_embeddings = 45
 
@@ -40,20 +35,15 @@ for label in train_labels:
     num_labels[label] += 1
     total += 1
     
-weight_for_unrelated = (2.0 / num_labels[0])*(total)
-weight_for_discuss = (2.0 / num_labels[1])*(total)
-weight_for_agree = (2.0 / num_labels[2])*(total)
-weight_for_disagree = (2.0 / num_labels[3])*(total)
+weight_for_unrelated = 1 / num_labels[0] * total
+weight_for_discuss = 1 / num_labels[1] * total
+weight_for_agree = 1 / num_labels[2] * total
+weight_for_disagree = 1 / num_labels[3] * total
 
-# weight_for_unrelated = 1
-# weight_for_discuss = 5
-# weight_for_agree = 14
-# weight_for_disagree = 60
 class_weights = {0: weight_for_unrelated, 1: weight_for_discuss, 2: weight_for_agree, 3: weight_for_disagree}
 print(class_weights)
 
 print('title length:', len(train_title))
-
 print('body length:', len(train_body))
 
 # Create layers for model
@@ -72,14 +62,7 @@ blayer_body = LSTM(50, return_state=True, go_backwards=True)
 lstm_body, fh_body, fc_body, bh_body, bc_body = Bidirectional(flayer_body, backward_layer=blayer_body)\
     (input_body, initial_state=[fh_title, fc_title, bh_title, bc_title])
 
-# Dense, Dropout and Dense (out) layers
-# dense1 = Dense(128, activation='relu')(keras.layers.average([fh_body, bh_body]))
-# dropout1 = Dropout(1e-3)(dense1)
-# dense2 = Dense(64, activation='relu')(dropout1)
-# dropout2 = Dropout(1e-3)(dense2)
-# output = Dense(4, activation='softmax')(dropout2)
-
-# dropout = Dropout(0.1)(keras.layers.average([fh_body, bh_body]))
+# Final dense softmax layer
 output = Dense(4, activation='softmax')(keras.layers.average([fh_body, bh_body]))
 
 model = Model(inputs=[input_title, input_body], outputs=[output], name='BiLSTM_Model')
@@ -88,7 +71,7 @@ model.compile(loss=SparseCategoricalCrossentropy(),
               optimizer=Adam(learning_rate=1e-3),
               metrics=['accuracy'])
 
-checkpoint = ModelCheckpoint("./LSTM_saves/lstm_best8.ckpt", monitor='val_acc', verbose=1,
+checkpoint = ModelCheckpoint("./LSTM_saves/lstm_best.ckpt", monitor='val_acc', verbose=1,
     save_best_only=True, save_weights_only=False, mode='auto', period=1)
 
 print("Training model on data")
@@ -96,7 +79,7 @@ print("Training model on data")
 history = model.fit([train_title, train_body],
                     train_labels,
                     batch_size=20,
-                    epochs=18,
+                    epochs=20,
                     shuffle=True,
                     validation_split=0.3,
                     class_weight=class_weights,
