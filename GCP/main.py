@@ -180,7 +180,7 @@ def handler(request):
     inputs[0], inputs[1] = process_input(content['title'], content['body'])
 
     lstm_articles = search(content['title']) #[(embedding, link)] of length 4
-    
+
     print('inputs set up...')
 
     # cnn cache
@@ -206,15 +206,27 @@ def handler(request):
         print('bilstm model loaded...')
 
     print("The top 4 related articles have the following stances: ")
+    lstm_predictions = []
+    lstm_links = []
     for i in range(len(lstm_articles)):
         article = lstm_articles[i]
         lstm_prediction = lstm.predict([inputs[0]], [article[0]])
         print("Article", i, "'s stance is:", lstm_prediction)
         print("Article", i, "'s Link:", article[1])
+        lstm_predictions.append(lstm_prediction) #For use in returning final JSON
+        lstm_links.append(article[1]) #For use in returning final JSON
 
     final_result = { 'result': final_cnn_pred }
-    json_result = jsonify(probability=str(cnn_predictions[0][0]),
-                          pred_class=str(np.round(cnn_predictions[0][0])))
+    json_result = jsonify(cnn_probability=str(cnn_predictions[0][0]),
+                          cnn_class=str(np.round(cnn_predictions[0][0])),
+                          article1_class=str(lstm_predictions[0]),
+                          article1_link=lstm_links[0],
+                          article2_class=str(lstm_predictions[1]),
+                          article2_link=lstm_links[1],
+                          article3_class=str(lstm_predictions[2]),
+                          article3_link=lstm_links[2],
+                          article4_class=str(lstm_predictions[3]),
+                          article4_link=lstm_links[3],)
     # print(json_result)
     # response = make_response(json_result)
     # print(response)
