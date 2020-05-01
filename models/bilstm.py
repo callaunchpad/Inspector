@@ -35,10 +35,10 @@ for label in train_labels:
     num_labels[label] += 1
     total += 1
     
-weight_for_unrelated = 1 / num_labels[0] * total
+weight_for_unrelated = 0.9 / num_labels[0] * total
 weight_for_discuss = 1 / num_labels[1] * total
-weight_for_agree = 1 / num_labels[2] * total
-weight_for_disagree = 1 / num_labels[3] * total
+weight_for_agree = 1.1 / num_labels[2] * total
+weight_for_disagree = 1.1 / num_labels[3] * total
 
 class_weights = {0: weight_for_unrelated, 1: weight_for_discuss, 2: weight_for_agree, 3: weight_for_disagree}
 print(class_weights)
