@@ -226,7 +226,7 @@ def handler(request):
                           article3_class=str(lstm_predictions[2]),
                           article3_link=lstm_links[2],
                           article4_class=str(lstm_predictions[3]),
-                          article4_link=lstm_links[3],)
+                          article4_link=lstm_links[3])
     # print(json_result)
     # response = make_response(json_result)
     # print(response)
