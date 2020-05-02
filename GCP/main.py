@@ -19,8 +19,7 @@ from tensorflow.keras.layers import Dropout, LSTM, Bidirectional, Concatenate
 from tensorflow.keras.datasets import imdb
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
-from search import search
-
+from good_search import search
 
 app = Flask(__name__)
 
@@ -99,7 +98,6 @@ class CustomModel():
                       optimizer=Adam(learning_rate=1e-3),
                       metrics=['accuracy'])
 
-
 def download_blob(bucket_name, source_blob_name, destination_file_name):
     """Downloads a blob from the bucket."""
     storage_client = storage.Client()
@@ -112,6 +110,16 @@ def download_blob(bucket_name, source_blob_name, destination_file_name):
         source_blob_name,
         destination_file_name))
 
+print('pre_download_blob...')
+
+download_blob('cnn_model_inspector', 'emb_dict.pkl', '/tmp/emb_dict.pkl')
+
+print('post_download_blob...')
+
+emb_dict = load_file('/tmp/emb_dict.pkl')
+
+print('emb_dict loaded!')
+
 def process_input(title, body):
     arr_title = remove_punc(title)
     arr_title = remove_stopwords(arr_title)
@@ -122,16 +130,6 @@ def process_input(title, body):
     arr_body = lemmatize(arr_body)
 
     empty_array = np.array([0]*50)
-
-    print('pre_download_blob...')
-
-    download_blob('cnn_model_inspector', 'emb_dict.pkl', '/tmp/emb_dict.pkl')
-
-    print('post_download_blob...')
-
-    emb_dict = load_file('/tmp/emb_dict.pkl')
-
-    print('emb_dict loaded!')
 
     title_embedding = []
     for word in arr_title:
@@ -179,8 +177,9 @@ def handler(request):
     inputs = [0, 0]
     inputs[0], inputs[1] = process_input(content['title'], content['body'])
 
-    lstm_articles = search(content['title']) #[(embedding, link)] of length 4
-
+    print("pre-search")
+    lstm_articles = search(content['title'], emb_dict) #[(embedding, link)] of length 4
+    
     print('inputs set up...')
 
     # cnn cache
