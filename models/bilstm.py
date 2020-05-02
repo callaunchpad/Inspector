@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Dense, Dropout, LSTM, Bidirectional, Concatenate
+from tensorflow.keras.layers import Dense, LSTM, Bidirectional
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.callbacks import ModelCheckpoint
@@ -28,54 +28,56 @@ test_title = data.test_titles
 test_body = data.test_bodies
 test_labels = data.test_labels
 
-# Add class weights to make training better
+print('title length:', len(train_title))
+print('body length:', len(train_body))
+
+# Create class weights to make training more even
 num_labels = [0, 0, 0, 0]
 total = 0
 for label in train_labels:
     num_labels[label] += 1
     total += 1
     
-weight_for_unrelated = 0.9 / num_labels[0] * total
+weight_for_unrelated = 1 / num_labels[0] * total
 weight_for_discuss = 1 / num_labels[1] * total
-weight_for_agree = 1.1 / num_labels[2] * total
-weight_for_disagree = 1.1 / num_labels[3] * total
+weight_for_agree = 1 / num_labels[2] * total
+weight_for_disagree = 1 / num_labels[3] * total
 
 class_weights = {0: weight_for_unrelated, 1: weight_for_discuss, 2: weight_for_agree, 3: weight_for_disagree}
 print(class_weights)
 
-print('title length:', len(train_title))
-print('body length:', len(train_body))
 
-# Create layers for model
-input_title = keras.layers.Input(shape=(num_title_embeddings, embedding_size))
+def create_bilstm():
+    input_title = keras.layers.Input(shape=(num_title_embeddings, embedding_size))
 
-# BiLSTM layer that reads in a title input
-flayer_title = LSTM(50, return_state=True)
-blayer_title = LSTM(50, return_state=True, go_backwards=True)
-lstm_title, fh_title, fc_title, bh_title, bc_title = Bidirectional(flayer_title, backward_layer=blayer_title)(input_title)
+    # BiLSTM layer that reads in a title input
+    flayer_title = LSTM(50, return_state=True)
+    blayer_title = LSTM(50, return_state=True, go_backwards=True)
+    lstm_title, fh_title, fc_title, bh_title, bc_title = Bidirectional(flayer_title, backward_layer=blayer_title)(input_title)
 
-input_body = keras.layers.Input(shape=(num_body_embeddings, embedding_size))
+    input_body = keras.layers.Input(shape=(num_body_embeddings, embedding_size))
 
-# BiLSTM layer that reads in a body input and uses the previous layer's output as initial states
-flayer_body = LSTM(50, return_state=True)
-blayer_body = LSTM(50, return_state=True, go_backwards=True)
-lstm_body, fh_body, fc_body, bh_body, bc_body = Bidirectional(flayer_body, backward_layer=blayer_body)\
-    (input_body, initial_state=[fh_title, fc_title, bh_title, bc_title])
+    # BiLSTM layer that reads in a body input and uses the previous layer's output as initial states
+    flayer_body = LSTM(50, return_state=True)
+    blayer_body = LSTM(50, return_state=True, go_backwards=True)
+    lstm_body, fh_body, fc_body, bh_body, bc_body = Bidirectional(flayer_body, backward_layer=blayer_body)\
+        (input_body, initial_state=[fh_title, fc_title, bh_title, bc_title])
 
-# Final dense softmax layer
-output = Dense(4, activation='softmax')(keras.layers.average([fh_body, bh_body]))
+    output = Dense(4, activation='softmax')(keras.layers.average([fh_body, bh_body]))
+    model = Model(inputs=[input_title, input_body], outputs=[output], name='BiLSTM_Model')
+    model.compile(loss=SparseCategoricalCrossentropy(),
+                  optimizer=Adam(learning_rate=1e-3),
+                  metrics=['accuracy'])
 
-model = Model(inputs=[input_title, input_body], outputs=[output], name='BiLSTM_Model')
+    return model
 
-model.compile(loss=SparseCategoricalCrossentropy(),
-              optimizer=Adam(learning_rate=1e-3),
-              metrics=['accuracy'])
 
+model = create_bilstm()
 checkpoint = ModelCheckpoint("./LSTM_saves/lstm_best.ckpt", monitor='val_acc', verbose=1,
-    save_best_only=True, save_weights_only=False, mode='auto', period=1)
+                             save_best_only=True, save_weights_only=False, mode='auto', period=1)
 
+# Train model
 print("Training model on data")
-
 history = model.fit([train_title, train_body],
                     train_labels,
                     batch_size=20,
@@ -85,6 +87,7 @@ history = model.fit([train_title, train_body],
                     class_weight=class_weights,
                     callbacks=[checkpoint])
 
+# Evaluate model
 print("Evaluating model on data")
 test_scores = model.evaluate([test_title, test_body], y=test_labels, verbose=2)
 print('Test loss:', test_scores[0])
