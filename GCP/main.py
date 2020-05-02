@@ -19,13 +19,12 @@ from tensorflow.keras.layers import Dropout, LSTM, Bidirectional, Concatenate
 from tensorflow.keras.datasets import imdb
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
-from search import search
-
+from good_search import search
 
 app = Flask(__name__)
 
 cnn = None
-BiLSTM = None
+lstm = None
 
 class CustomModel():
     def __init__(self):
@@ -99,7 +98,6 @@ class CustomModel():
                       optimizer=Adam(learning_rate=1e-3),
                       metrics=['accuracy'])
 
-
 def download_blob(bucket_name, source_blob_name, destination_file_name):
     """Downloads a blob from the bucket."""
     storage_client = storage.Client()
@@ -112,6 +110,16 @@ def download_blob(bucket_name, source_blob_name, destination_file_name):
         source_blob_name,
         destination_file_name))
 
+print('pre_download_blob...')
+
+download_blob('cnn_model_inspector', 'emb_dict.pkl', '/tmp/emb_dict.pkl')
+
+print('post_download_blob...')
+
+emb_dict = load_file('/tmp/emb_dict.pkl')
+
+print('emb_dict loaded!')
+
 def process_input(title, body):
     arr_title = remove_punc(title)
     arr_title = remove_stopwords(arr_title)
@@ -122,16 +130,6 @@ def process_input(title, body):
     arr_body = lemmatize(arr_body)
 
     empty_array = np.array([0]*50)
-
-    print('pre_download_blob...')
-
-    download_blob('cnn_model_inspector', 'emb_dict.pkl', '/tmp/emb_dict.pkl')
-
-    print('post_download_blob...')
-
-    emb_dict = load_file('/tmp/emb_dict.pkl')
-
-    print('emb_dict loaded!')
 
     title_embedding = []
     for word in arr_title:
@@ -173,33 +171,61 @@ def nltk_test(inp):
 
 def handler(request):
     print("beginning...")
-    global model
+    global cnn, lstm
     content = request.get_json()
     print('requested json: ', content)
     inputs = [0, 0]
     inputs[0], inputs[1] = process_input(content['title'], content['body'])
+
+    print("pre-search")
+    lstm_articles = search(content['title'], emb_dict) #[(embedding, link)] of length 4
+    
     print('inputs set up...')
 
-    # Model load which only happens during cold starts
+    # cnn cache
     if cnn is None:
         download_blob('cnn_model_inspector', 'cnn.ckpt', '/tmp/weights.ckpt')
         cnn = CustomModel().cnn
         cnn.load_weights('/tmp/weights.ckpt')
-        print('model loaded...')
+        print('cnn model loaded...')
 
-    if BiLSTM is None:
+    cnn_predictions = cnn.predict([[inputs[0]], [inputs[1]]])
+    # print('CNN Predictions: ', cnn_predictions)
+
+    real_fake = {0: "Fake!", 1: "Real!"}
+    final_cnn_pred = real_fake[np.round(cnn_predictions[0][0])]
+
+    print("We predict the article is ", final_cnn_pred)
+
+    # lstm cache
+    if lstm is None:
         download_blob('cnn_model_inspector', 'lstm.ckpt', '/tmp/lstmweights.ckpt')
         lstm = CustomModel().lstm
         lstm.load_weights('/tmp/lstmweights.ckpt')
-        print('model loaded...')
+        print('bilstm model loaded...')
 
-    cnn_predictions = cnn.predict([[inputs[0]], [inputs[1]]])
-    print(cnn_predictions)
-    print("Article is ", np.round(cnn_predictions[0][0]) )
+    print("The top 4 related articles have the following stances: ")
+    lstm_predictions = []
+    lstm_links = []
+    for i in range(len(lstm_articles)):
+        article = lstm_articles[i]
+        lstm_prediction = lstm.predict([inputs[0]], [article[0]])
+        print("Article", i, "'s stance is:", lstm_prediction)
+        print("Article", i, "'s Link:", article[1])
+        lstm_predictions.append(lstm_prediction) #For use in returning final JSON
+        lstm_links.append(article[1]) #For use in returning final JSON
 
-    final_result = { 'result': str(np.round(cnn_predictions[0][0])) }
-    json_result = jsonify(probability=str(cnn_predictions[0][0]),
-                          pred_class=str(np.round(cnn_predictions[0][0])))
+    final_result = { 'result': final_cnn_pred }
+    json_result = jsonify(cnn_probability=str(cnn_predictions[0][0]),
+                          cnn_class=str(np.round(cnn_predictions[0][0])),
+                          article1_class=str(lstm_predictions[0]),
+                          article1_link=lstm_links[0],
+                          article2_class=str(lstm_predictions[1]),
+                          article2_link=lstm_links[1],
+                          article3_class=str(lstm_predictions[2]),
+                          article3_link=lstm_links[2],
+                          article4_class=str(lstm_predictions[3]),
+                          article4_link=lstm_links[3])
     # print(json_result)
     # response = make_response(json_result)
     # print(response)
