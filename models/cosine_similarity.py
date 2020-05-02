@@ -2,6 +2,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
 import pandas as pd
 import numpy as np
+from numpy.linalg import norm
+from scipy import spatial
 
 def cosine_sim_matrices(text_embeddings, title_embeddings):
     count_vectorizer = CountVectorizer()
@@ -27,11 +29,12 @@ def cos_sim_avgs(text_embeddings, title_embeddings):
     avg_text = np.mean(text_embeddings, axis=0)
     avg_title = np.mean(title_embeddings, axis=0)
 
-    cos_sim = np.dot(avg_text, avg_title))
+    cos_sim = 1 - np.dot(avg_text, avg_title)/(norm(avg_text) * norm(avg_title))
     return cos_sim
 
 
 TEST_text = [np.array([1, 2, 3, 4, 5]), np.array([1, 2, 3, 4, 5]), np.array([1, 2, 3, 4, 5])]
+#TEST_title = [np.array([1, 2, 3, 4, 5]), np.array([1, 2, 3, 4, 5]), np.array([1, 2, 3, 4, 5])]
 TEST_title = [np.array([-1, -2, -3, -4, -5]), np.array([6, 7, 8, 9, 10])]
 
-cos_sim_avgs(TEST_text, TEST_title)
+print(cos_sim_avgs(TEST_text, TEST_title))
