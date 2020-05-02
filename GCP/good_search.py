@@ -5,12 +5,15 @@ import urllib.parse
 from urllib.parse import urlparse
 from nlp_tools import make_embeddings_dict, save_file, load_file, remove_punc, remove_stopwords, lemmatize
 
+emb_dict = load_file('emb_dict.pkl')
+
 def search(query, emb_dict):
     urls = googleSearch(query)
     result = []
+    print("ran search. Number of Urls is: ", len(urls))
     for url in urls:
         result.append((word_embeddings(process_url(url), emb_dict), url))
-        print(result[-1])
+        # print(result[-1])
     return result
     
 def googleSearch(query):
@@ -61,3 +64,5 @@ def process_url(url):
             output += '{} '.format(t.get_text())
 
     return output
+
+print(len(search('Coronavirus Live Updates: As Economy Hemorrhages Jobs, Europeans Agree to Prime E.U.’s Pump - The New York Times', emb_dict)))

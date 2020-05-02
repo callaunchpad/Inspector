@@ -159,16 +159,6 @@ def process_input(title, body):
 
     return title_embedding, body_embedding
 
-def nltk_test(inp):
-    # looks like request.get_json() and the input.get_json() do the same thing
-    print(request.get_json())
-    print(inp.get_json())
-    print(remove_punc("this, is some sample text."))
-    arr = remove_punc("this, is some sample text.")
-    arr = remove_stopwords(arr)
-    arr = lemmatize(arr)
-    print(arr)
-
 def handler(request):
     print("beginning...")
     global cnn, lstm
@@ -178,19 +168,23 @@ def handler(request):
     inputs[0], inputs[1] = process_input(content['title'], content['body'])
 
     print("pre-search")
+    print(content['title'], content['body'])
     lstm_articles = search(content['title'], emb_dict) #[(embedding, link)] of length 4
     
     print('inputs set up...')
+    custom_model = None
+    if cnn is None or lstm is None:
+        custom_model = CustomModel()
+        print('constructed model class')
 
     # cnn cache
     if cnn is None:
         download_blob('cnn_model_inspector', 'cnn.ckpt', '/tmp/weights.ckpt')
-        cnn = CustomModel().cnn
+        cnn = custom_model.cnn
         cnn.load_weights('/tmp/weights.ckpt')
         print('cnn model loaded...')
 
     cnn_predictions = cnn.predict([[inputs[0]], [inputs[1]]])
-    # print('CNN Predictions: ', cnn_predictions)
 
     real_fake = {0: "Fake!", 1: "Real!"}
     final_cnn_pred = real_fake[np.round(cnn_predictions[0][0])]
@@ -200,10 +194,13 @@ def handler(request):
     # lstm cache
     if lstm is None:
         download_blob('cnn_model_inspector', 'lstm.ckpt', '/tmp/lstmweights.ckpt')
-        lstm = CustomModel().lstm
+        print('finished downloading lstm blob')
+        lstm = custom_model.lstm
+        print('loading lstm weights...')
         lstm.load_weights('/tmp/lstmweights.ckpt')
         print('bilstm model loaded...')
 
+    print('article info: ', lstm_articles, len(lstm_articles))
     print("The top 4 related articles have the following stances: ")
     lstm_predictions = []
     lstm_links = []
@@ -214,8 +211,8 @@ def handler(request):
         print("Article", i, "'s Link:", article[1])
         lstm_predictions.append(lstm_prediction) #For use in returning final JSON
         lstm_links.append(article[1]) #For use in returning final JSON
-
-    final_result = { 'result': final_cnn_pred }
+    
+    # HANDLE CASES IN WHICH THERE MIGHT BE LESS THAN 4 RESULTS
     json_result = jsonify(cnn_probability=str(cnn_predictions[0][0]),
                           cnn_class=str(np.round(cnn_predictions[0][0])),
                           article1_class=str(lstm_predictions[0]),
@@ -225,9 +222,5 @@ def handler(request):
                           article3_class=str(lstm_predictions[2]),
                           article3_link=lstm_links[2],
                           article4_class=str(lstm_predictions[3]),
-                          article4_link=lstm_links[3])
-    # print(json_result)
-    # response = make_response(json_result)
-    # print(response)
-    # print(json.dumps(final_result), 200, {'Content-Type': 'application/json'})
+                          article4_link=str(lstm_links[3]))
     return json_result

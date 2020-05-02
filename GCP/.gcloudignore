@@ -12,5 +12,5 @@
 # below:
 .git
 .gitignore
-
+emb_dict.pkl
 node_modules
