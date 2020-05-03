@@ -1,5 +1,5 @@
 async function main(){
-    SERVER_ENDPOINT = 'https://us-central1-inspector-project.cloudfunctions.net/handler';
+    SERVER_ENDPOINT = 'https://us-central1-inspector-project.cloudfunctions.net/fuck_gcp';
 
     const fetch = require("node-fetch");
 

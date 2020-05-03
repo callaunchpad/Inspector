@@ -6,12 +6,16 @@ from urllib.parse import urlparse
 from nlp_tools import make_embeddings_dict, save_file, load_file, remove_punc, remove_stopwords, lemmatize
 
 def search(query, emb_dict):
+    print("search beginning...")
     articles_info = googleSearch(query)
     result = []
+    print("article_info length:", len(articles_info))
     for text, link in articles_info:
-        print(link)
-        print("text", text)
+        text = text[:500]
+        # print(link)
+        # print("text", word_embeddings(text, emb_dict))
         result.append((word_embeddings(text, emb_dict), link))
+    # print(result)
     return result
     
 def googleSearch(query):
@@ -27,13 +31,17 @@ def googleSearch(query):
         urls = re.split(":(?=http)",link["href"].replace("/url?q=",""))
         urls = [url.split("&sa=U&ved")[0] for url in urls]
         links.extend(urls)
-    # print(links[:4])
+    print("4 links:", links[:4])
 
     i = 0
     while len(result) < 4 and i < len(links): #returns first 4 links in the google search
+        print("while loop started...")
         processed_link = process_url(links[i])
         if len(processed_link) != 0:
             result.append((processed_link, links[i]))
+        i += 1
+
+    print("search length:", len(result))
 
     return result 
 
@@ -78,5 +86,5 @@ def process_url(url):
     # print(output)
     return output
 
-emb_dict = load_file('../models/emb_dict.pkl')
-search('corona', emb_dict)
+# emb_dict = load_file('../models/emb_dict.pkl')
+# search('Coronavirus Live Updates: As Economy Hemorrhages Jobs, Europeans Agree to Prime E.U.’s Pump - The New York Times', emb_dict)
