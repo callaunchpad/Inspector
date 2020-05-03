@@ -1,14 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <h2>Here are your results!</h2>
-</head>
-<body>
-    <h3 id="predicted class">predicted class: </h3>
-    <h3 id="score">probability: </h3>
-    <h3>related articles: N/A</h3>
-    
+    <body style="background-color:powderblue;"></body>
+    <head >
+        <link rel="stylesheet" href="styles.css">
+        <title>Here are your results!</title>
+    </head>
+    <body>
+        <div class="box">
+            <h2>Article Results</h2>
+            <hr>
+            <div class="smaller">
+                <h3 id="predicted class">Predicted Class: fake </h3>
+                <h3 id="score">Probability: 0.99999</h3>
+                <div class="space"></div>
+                <h3 class="black">Related Articles</h3>
+                
+                <table>
+                    <tr>
+                        <th>Stance </th>
+                        <th>Link</th>
+                    </tr>
+                    <tr class = "notfirst">
+                        <td>discuss</td>
+                        <td>
+                            <a href="https://www.nytimes.com/2020/05/01/us/coronavirus-states-reopen-tension.html">
+                                https://www.nytimes.com/2020/05/01/us/coronavirus-states-reopen-tension.html
+                            </a>
+                        </td>
+                    </tr>
+                    <tr class = "notfirst">
+                        <td>disagree</td>
+                        <td>
+                            <a href="https://www.nytimes.com/2020/05/01/arts/botanic-gardens-new-york-virus.html">
+                                https://www.nytimes.com/2020/05/01/arts/botanic-gardens-new-york-virus.html
+                            </a>
+                        </td>
+                    </tr>
+                    <tr class = "notfirst">
+                        <td>agree</td>
+                        <td>
+                            <a href="https://www.nytimes.com/2020/05/01/arts/television/parks-and-recreation-reunion-review.html">
+                                https://www.nytimes.com/2020/05/01/arts/television/parks-and-recreation-reunion-review.html
+                            </a>
+                        </td>
+                    </tr>
+                    <tr class = "notfirst">
+                        <td>related</td>
+                        <td>
+                            <a href="https://www.nytimes.com/2020/05/01/us/coronavirus-college-enrollment.html">
+                                https://www.nytimes.com/2020/05/01/us/coronavirus-college-enrollment.html
+                            </a>
+                        </td>
+                    </tr>
+                </table>
 
-    <script type="text/javascript" src="display.js" async></script>
-</body>
+                <p> STANCE KEY </p>
+                <p> Agree: The body text agrees with the headline.</p>
+                <p> Disagrees: The body text disagrees with the headline. </p>
+                <p> Discusses: The body text discuss the same topic as the headline, but does not take a position. </p>
+                <p> Unrelated: The body text discusses a different topic than the headline. </p>
+            </div>
+
+        </div>
+
+        <script type="text/javascript" src="display.js" async></script>
+    </body>
 </html>

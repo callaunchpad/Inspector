@@ -47,7 +47,7 @@ chrome.browserAction.onClicked.addListener(async (tab) => {
 
         //format results into URL
         let { pred_class, probability } = model_result;
-        chrome.windows.create({url: "display.html?data=" + encodeURIComponent(JSON.stringify({p_class: pred_class, p_score: probability})), type: "popup", height: 400, width: 400});
+        chrome.windows.create({url: "display.html?data=" + encodeURIComponent(JSON.stringify({p_class: pred_class, p_score: probability})), type: "popup", height: 500, width: 460});
         
         chrome.tabs.sendMessage(tab.id, message)
     });
