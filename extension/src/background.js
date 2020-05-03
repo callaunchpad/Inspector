@@ -1,9 +1,5 @@
 // if we wanna make this automatic after clicking icon, put javascript here for automatic processing
 // https://www.youtube.com/watch?v=ew9ut7ixIlI
-var SEND_REQUEST = "send request"
-let SERVER_ENDPOINT = 'https://us-central1-inspector-project.cloudfunctions.net/handler';
-var request_body = {'title': 'Coronavirus Live Updates: As Economy Hemorrhages Jobs, Europeans Agree to Prime E.U.’s Pump - The New York Times',
-                'body': 'I hate monkeys. I just want cookies.'};
 console.log("backgroud running");
 
 import Mercury from '@postlight/mercury-parser';
@@ -22,21 +18,44 @@ chrome.browserAction.onClicked.addListener(async (tab) => {
         console.log("url: ", url);
 
         // get webpage information with the Mercury package
-        var webpage_info = await Mercury.parse(url);
+        let [webpageInfo, sourceType] = await Promise.all([Mercury.parse(url), checkSources(url)]);
+        
+        // var webpage_info = await Mercury.parse(url);
 
         // remove html tags with regex
-        let article_body = webpage_info.content.replace( /(<([^>]+)>)/ig, '');
-        let article_title = webpage_info.title;
-        console.log("title: ", article_title);
-        console.log("body: ", article_body);
+        let articleBody = webpageInfo.content.replace( /(<([^>]+)>)/ig, '');
+        let articleTitle = webpageInfo.title;
+        console.log("title: ", articleTitle);
+        console.log("body: ", articleBody);
 
-        let model_result = await inference(article_title, article_body);
-        let message = { model_result };
-
-        //format results into URL
-        let { pred_class, probability } = model_result;
-        chrome.windows.create({url: "display.html?data=" + encodeURIComponent(JSON.stringify({p_class: pred_class, p_score: probability})), type: "popup", height: 400, width: 400});
+        let modelResult = await inference(articleTitle, articleBody);
+        let message = { modelResult };
         
-        chrome.tabs.sendMessage(tab.id, message)
+        chrome.tabs.sendMessage(tab.id, message);
     });
 });
+
+// checks to see if the webpage url is on our list of 
+// trusted/sketch sources. Returns source type as a string if it is,
+// otherwise it returns null.
+async function checkSources(url) {
+    let res = await fetch("./sources.json");
+    let sources = res.json();
+    let hostName = getHostName(url);
+    if (sources[hostName] != null) {
+        return sources[hostName].type;
+    }
+    return null;
+}
+
+// extracts just the hostname of a url using regex
+function getHostName(url) {
+    var match = url.match(/:\/\/(www[0-9]?\.)?(.[^/:]+)/i);
+    if (match != null && match.length > 2 && typeof match[2] === 'string' && match[2].length > 0) {
+        console.log("hostname: ", match[2]);
+        return match[2];
+    }
+    else {
+        return null;
+    }
+}

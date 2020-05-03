@@ -5,7 +5,6 @@ import urllib.parse
 from urllib.parse import urlparse
 from nlp_tools import make_embeddings_dict, save_file, load_file, remove_punc, remove_stopwords, lemmatize
 import time
-emb_dict = load_file('emb_dict.pkl')
 
 def search(query, emb_dict):
     print("search beginning...")
