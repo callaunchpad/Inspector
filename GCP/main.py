@@ -26,6 +26,7 @@ app = Flask(__name__)
 
 cnn = None
 lstm = None
+stances = {0: 'unrelated', 1: 'discuss', 2: 'agree', 3: 'disagree'}
 
 class CustomModel():
     def __init__(self):
@@ -71,14 +72,14 @@ class CustomModel():
         num_body_embeddings = 40
 
         # Create layers for model
-        input_title = keras.layers.Input(shape = (num_title_embeddings, embedding_size))
+        input_title = keras.layers.Input(shape = (None, embedding_size))
 
         # BiLSTM layer that reads in a title input
         flayer_title = LSTM(60, return_state=True)
         blayer_title = LSTM(60, return_state=True, go_backwards=True)
         lstm_title, fh_title, fc_title, bh_title, bc_title = Bidirectional(flayer_title, backward_layer=blayer_title)(input_title)
 
-        input_body = keras.layers.Input(shape = (num_body_embeddings, embedding_size))
+        input_body = keras.layers.Input(shape = (None, embedding_size))
 
         # BiLSTM layer that reads in a body input and uses the previous layer's output as initial states
         flayer_body = LSTM(60, return_state=True)
@@ -122,7 +123,7 @@ def search(query, emb_dict):
     
 def googleSearch(query):
     print('googleSearch query:', query)
-    url = 'https://www.google.com/search?client=ubuntu&channel=fs&q={}&ie=utf-8&oe=utf-8'.format(query)
+    url = 'https://www.bing.com/news/search?client=ubuntu&channel=fs&q={}&ie=utf-8&oe=utf-8'.format(query)
     print('url:', url)
     res = requests.get(url)
     soup = BeautifulSoup(res.content, features='lxml')
@@ -131,7 +132,7 @@ def googleSearch(query):
     result = []
     links = []
     
-    for link in soup.find_all("a",href=re.compile("(?<=/url\?q=)(htt.*://.*)")):
+    for link in soup.find_all("a",href=re.compile("(htt.*://.*)")):
         urls = re.split(":(?=http)",link["href"].replace("/url?q=",""))
         urls = [url.split("&sa=U&ved")[0] for url in urls]
         links.extend(urls)
@@ -254,9 +255,6 @@ def process_input(title, body):
 
     return title_embedding, body_embedding
 
-<<<<<<< HEAD
-def handler(request):
-=======
 def nltk_test(inp):
     # looks like request.get_json() and the input.get_json() do the same thing
     print(request.get_json())
@@ -268,7 +266,6 @@ def nltk_test(inp):
     print(arr)
 
 def fuck_gcp(request):
->>>>>>> 3c4567fe5b7e4a7e7184dc32db795a20797334b9
     global_time = time.time()
     print("global time", global_time)
     print("beginning...")
@@ -289,7 +286,7 @@ def fuck_gcp(request):
     if cnn is None:
         cnn_time = time.time()
         download_blob('cnn_model_inspector', 'cnn.ckpt', '/tmp/weights.ckpt')
-        cnn = custom_model.cnn
+        cnn = CustomModel().cnn
         cnn.load_weights('/tmp/weights.ckpt')
         print('cnn model loaded...', time.time()-cnn_time)
 
@@ -308,19 +305,18 @@ def fuck_gcp(request):
         lstm_time = time.time()
         download_blob('cnn_model_inspector', 'lstm.ckpt', '/tmp/lstmweights.ckpt')
         print('finished downloading lstm blob')
-        lstm = custom_model.lstm
+        lstm = CustomModel().lstm
         print('loading lstm weights...')
         lstm.load_weights('/tmp/lstmweights.ckpt')
         print('bilstm model loaded...', time.time()-lstm_time)
 
-    print('article info: ', lstm_articles, len(lstm_articles))
     print("The top 4 related articles have the following stances: ")
     lstm_pred_time = time.time()
     lstm_predictions = []
     lstm_links = []
     for i in range(len(lstm_articles)):
         article = lstm_articles[i]
-        lstm_prediction = lstm.predict([inputs[0]], [article[0]])
+        lstm_prediction = lstm.predict([ [inputs[0]], [article[0]] ])
         print("Article", i, "'s stance is:", lstm_prediction)
         print("Article", i, "'s Link:", article[1])
         lstm_predictions.append(lstm_prediction) #For use in returning final JSON
@@ -331,13 +327,13 @@ def fuck_gcp(request):
     final_result = { 'result': final_cnn_pred }
     json_result = jsonify(cnn_probability=str(cnn_predictions[0][0]),
                           cnn_class=str(np.round(cnn_predictions[0][0])),
-                          article1_class=str(lstm_predictions[0]),
+                          article1_class=str(stances[np.argmax(lstm_predictions[0][0])]),
                           article1_link=lstm_links[0],
-                          article2_class=str(lstm_predictions[1]),
+                          article2_class=str(stances[np.argmax(lstm_predictions[1][0])]),
                           article2_link=lstm_links[1],
-                          article3_class=str(lstm_predictions[2]),
+                          article3_class=str(stances[np.argmax(lstm_predictions[2][0])]),
                           article3_link=lstm_links[2],
-                          article4_class=str(lstm_predictions[3]),
+                          article4_class=str(stances[np.argmax(lstm_predictions[3][0])]),
                           article4_link=lstm_links[3])
     # print(json_result)
     # response = make_response(json_result)

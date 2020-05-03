@@ -3,7 +3,7 @@ async function main(){
 
     const fetch = require("node-fetch");
 
-    var request_body = {'title': 'Coronavirus Live Updates: As Economy Hemorrhages Jobs, Europeans Agree to Prime E.U.’s Pump - The New York Times',
+    var request_body = {'title': 'Jobless Claims Surpass 16 Million; Aid Package Stalls in Senate',
                     'body': 'I hate monkeys. I just want cookies.'};
 
     let result = await fetch(SERVER_ENDPOINT, {

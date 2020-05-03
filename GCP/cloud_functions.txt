@@ -1,2 +1,4 @@
 Doc Link: https://docs.google.com/document/d/1GCEwy38eW0IkKPz6Zk-gKGWem6eThhsIYA6j_-aua_c/edit?usp=sharing
 gcloud functions deploy handler --runtime python37 --trigger-http --memory=2048MB
+gcloud functions logs read FUNCTION_NAME --execution-id EXECUTION_ID
+gcloud functions logs read FUNCTION_NAME 
