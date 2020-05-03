@@ -17,6 +17,9 @@ chrome.browserAction.onClicked.addListener(async (tab) => {
 
     // sending message to content.js for it to handle stuff
     chrome.tabs.query({active: true, lastFocusedWindow: true}, async (tabs) => {
+        let dict = {};
+        chrome.tabs.sendMessage(tab.id, dict);
+
         // why do they still use callbacks kill me
         let url = tabs[0].url;
         console.log("url: ", url);
@@ -46,9 +49,24 @@ chrome.browserAction.onClicked.addListener(async (tab) => {
         // };
 
         //format results into URL
-        let { pred_class, probability } = model_result;
-        chrome.windows.create({url: "display.html?data=" + encodeURIComponent(JSON.stringify({p_class: pred_class, p_score: probability})), type: "popup", height: 500, width: 460});
+        let { cnn_probability, cnn_class, 
+            article1_class, article1_link, 
+            article2_class, article2_link, 
+            article3_class, article3_link, 
+            article4_class, article4_link } = model_result;
+        chrome.windows.create({url: "display.html?data=" + encodeURIComponent(JSON.stringify({
+            p_class: cnn_probability, 
+            p_score: cnn_class, 
+            a1_class: article1_class,
+            a1_link: article1_link,
+            a2_class: article2_class,
+            a2_link: article2_link,
+            a3_class: article3_class,
+            a3_link: article3_link,
+            a4_class: article4_class,
+            a4_link: article4_link
+        })), type: "popup", height: 500, width: 460});
         
-        chrome.tabs.sendMessage(tab.id, message)
+        // chrome.tabs.sendMessage(tab.id, message)
     });
 });

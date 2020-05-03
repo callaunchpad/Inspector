@@ -5,6 +5,8 @@ console.log('listener added');
 
 chrome.runtime.onMessage.addListener(gotMessage);
 async function gotMessage(message, sender, sendResponse) {
-    let { model_result } = message;
-    let { pred_class, probability } = model_result;
+    // let { model_result } = message;
+    // let { pred_class, probability } = model_result;
+    console.log('entered here');
+    alert("Thanks for using inspector! Your program is running. Please wait for a window to pop up.");
 }
