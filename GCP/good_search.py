@@ -8,22 +8,36 @@ from nlp_tools import make_embeddings_dict, save_file, load_file, remove_punc, r
 emb_dict = load_file('emb_dict.pkl')
 
 def search(query, emb_dict):
-    urls = googleSearch(query)
+    articles_info = googleSearch(query)
     result = []
-    print("ran search. Number of Urls is: ", len(urls))
-    for url in urls:
-        result.append((word_embeddings(process_url(url), emb_dict), url))
-        # print(result[-1])
+    for text, link in articles_info:
+        print(link)
+        print("text", text)
+        result.append((word_embeddings(text, emb_dict), link))
     return result
     
 def googleSearch(query):
     url = 'https://www.google.com/search?client=ubuntu&channel=fs&q={}&ie=utf-8&oe=utf-8'.format(query)
     res = requests.get(url)
     soup = BeautifulSoup(res.content, features='lxml')
+    # print(soup)
+
+    result = []
     links = []
+    
     for link in soup.find_all("a",href=re.compile("(?<=/url\?q=)(htt.*://.*)")):
-        links.extend(re.split(":(?=http)",link["href"].replace("/url?q=","")))
-    return links[:4] #returns first 4 links in the google search
+        urls = re.split(":(?=http)",link["href"].replace("/url?q=",""))
+        urls = [url.split("&sa=U&ved")[0] for url in urls]
+        links.extend(urls)
+    # print(links[:4])
+
+    i = 0
+    while len(result) < 4 and i < len(links): #returns first 4 links in the google search
+        processed_link = process_url(links[i])
+        if len(processed_link) != 0:
+            result.append((processed_link, links[i]))
+
+    return result 
 
 def word_embeddings(text, emb_dict):
     embeddings = []
@@ -63,6 +77,8 @@ def process_url(url):
         if t.parent.name not in blacklist:
             output += '{} '.format(t.get_text())
 
+    # print(output)
     return output
 
-print(len(search('Coronavirus Live Updates: As Economy Hemorrhages Jobs, Europeans Agree to Prime E.U.’s Pump - The New York Times', emb_dict)))
+emb_dict = load_file('../models/emb_dict.pkl')
+search('corona', emb_dict)

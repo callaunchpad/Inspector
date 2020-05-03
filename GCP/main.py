@@ -21,6 +21,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from good_search import search
 
+import time
 app = Flask(__name__)
 
 cnn = None
@@ -160,6 +161,8 @@ def process_input(title, body):
     return title_embedding, body_embedding
 
 def handler(request):
+    global_time = time.time()
+    print("global time", global_time)
     print("beginning...")
     global cnn, lstm
     content = request.get_json()
@@ -168,40 +171,42 @@ def handler(request):
     inputs[0], inputs[1] = process_input(content['title'], content['body'])
 
     print("pre-search")
-    print(content['title'], content['body'])
+    lstm_time = time.time()
     lstm_articles = search(content['title'], emb_dict) #[(embedding, link)] of length 4
     
-    print('inputs set up...')
-    custom_model = None
-    if cnn is None or lstm is None:
-        custom_model = CustomModel()
-        print('constructed model class')
+    print('inputs set up...', time.time()-lstm_time)
 
     # cnn cache
     if cnn is None:
+        cnn_time = time.time()
         download_blob('cnn_model_inspector', 'cnn.ckpt', '/tmp/weights.ckpt')
         cnn = custom_model.cnn
         cnn.load_weights('/tmp/weights.ckpt')
-        print('cnn model loaded...')
+        print('cnn model loaded...', time.time()-cnn_time)
 
+    pred_time = time.time()
     cnn_predictions = cnn.predict([[inputs[0]], [inputs[1]]])
+    print('predicted', time.time()-pred_time)
+    # print('CNN Predictions: ', cnn_predictions)
 
     real_fake = {0: "Fake!", 1: "Real!"}
     final_cnn_pred = real_fake[np.round(cnn_predictions[0][0])]
 
-    print("We predict the article is ", final_cnn_pred)
+    print("We predict the article is", final_cnn_pred)
 
     # lstm cache
     if lstm is None:
+        lstm_time = time.time()
         download_blob('cnn_model_inspector', 'lstm.ckpt', '/tmp/lstmweights.ckpt')
         print('finished downloading lstm blob')
         lstm = custom_model.lstm
         print('loading lstm weights...')
         lstm.load_weights('/tmp/lstmweights.ckpt')
-        print('bilstm model loaded...')
+        print('bilstm model loaded...', time.time()-lstm_time)
 
     print('article info: ', lstm_articles, len(lstm_articles))
     print("The top 4 related articles have the following stances: ")
+    lstm_pred_time = time.time()
     lstm_predictions = []
     lstm_links = []
     for i in range(len(lstm_articles)):
@@ -211,8 +216,9 @@ def handler(request):
         print("Article", i, "'s Link:", article[1])
         lstm_predictions.append(lstm_prediction) #For use in returning final JSON
         lstm_links.append(article[1]) #For use in returning final JSON
-    
-    # HANDLE CASES IN WHICH THERE MIGHT BE LESS THAN 4 RESULTS
+    print("lstm prediction time:", time.time() - lstm_pred_time)
+
+    final_result = { 'result': final_cnn_pred }
     json_result = jsonify(cnn_probability=str(cnn_predictions[0][0]),
                           cnn_class=str(np.round(cnn_predictions[0][0])),
                           article1_class=str(lstm_predictions[0]),
@@ -222,5 +228,10 @@ def handler(request):
                           article3_class=str(lstm_predictions[2]),
                           article3_link=lstm_links[2],
                           article4_class=str(lstm_predictions[3]),
-                          article4_link=str(lstm_links[3]))
+                          article4_link=lstm_links[3])
+    # print(json_result)
+    # response = make_response(json_result)
+    # print(response)
+    # print(json.dumps(final_result), 200, {'Content-Type': 'application/json'})
+    print("total time:", time.time() - global_time)
     return json_result
