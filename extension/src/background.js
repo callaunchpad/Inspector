@@ -20,6 +20,7 @@ chrome.browserAction.onClicked.addListener(async (tab) => {
         let dict = {};
         chrome.tabs.sendMessage(tab.id, dict);
 
+        console.log("and it got here...")
         // why do they still use callbacks kill me
         let url = tabs[0].url;
         console.log("url: ", url);
@@ -35,28 +36,19 @@ chrome.browserAction.onClicked.addListener(async (tab) => {
 
         let model_result = await inference(article_title, article_body);
         let message = { model_result };
-        // let dict = {
-        //     "cnn_probability": "1234",
-        //     "cnn_class": str(np.round(cnn_predictions[0][0])),
-        //     "article1_class": str(lstm_predictions[0]),
-        //     "article1_link": lstm_links[0],
-        //     "article2_class": str(lstm_predictions[1]),
-        //     "article2_link": lstm_links[1],
-        //     "article3_class": str(lstm_predictions[2]),
-        //     "article3_link": lstm_links[2],
-        //     "article4_class": str(lstm_predictions[3]),
-        //     "article4_link": lstm_links[3],
-        // };
 
         //format results into URL
+
         let { cnn_probability, cnn_class, 
             article1_class, article1_link, 
             article2_class, article2_link, 
             article3_class, article3_link, 
             article4_class, article4_link } = model_result;
+
+        console.log("article1 class is: " + article1_class + " and article 2 class is: " + article2_class);
         chrome.windows.create({url: "display.html?data=" + encodeURIComponent(JSON.stringify({
-            p_class: cnn_probability, 
-            p_score: cnn_class, 
+            p_class: cnn_class, 
+            p_score: cnn_probability, 
             a1_class: article1_class,
             a1_link: article1_link,
             a2_class: article2_class,
@@ -65,8 +57,6 @@ chrome.browserAction.onClicked.addListener(async (tab) => {
             a3_link: article3_link,
             a4_class: article4_class,
             a4_link: article4_link
-        })), type: "popup", height: 500, width: 460});
-        
-        // chrome.tabs.sendMessage(tab.id, message)
+        })), type: "popup", height: 580, width: 500});
     });
 });

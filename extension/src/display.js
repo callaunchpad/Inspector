@@ -14,11 +14,15 @@ if (sharedData.p_class == 0) {
 }
 document.getElementById('score').textContent += sharedData.p_score;
 
-document.getElementById('article stance ' + i).textContent += sharedData.a1_class;
-document.getElementById('article link ' + i).textContent += sharedData.a1_link;
-document.getElementById('article stance ' + i).textContent += sharedData.a2_class;
-document.getElementById('article link ' + i).textContent += sharedData.a2_link;
-document.getElementById('article stance ' + i).textContent += sharedData.a3_class;
-document.getElementById('article link ' + i).textContent += sharedData.a3_link;
-document.getElementById('article stance ' + i).textContent += sharedData.a3_class;
-document.getElementById('article link ' + i).textContent += sharedData.a3_link;
+document.getElementById('article stance 1').textContent += sharedData.a1_class;
+document.getElementById('article link 1').textContent += sharedData.a1_link;
+document.getElementById('article link 1').setAttribute("href", sharedData.a1_link);
+document.getElementById('article stance 2').textContent += sharedData.a2_class;
+document.getElementById('article link 2').textContent += sharedData.a2_link;
+document.getElementById('article link 2').setAttribute("href", sharedData.a2_link);
+document.getElementById('article stance 3').textContent += sharedData.a3_class;
+document.getElementById('article link 3').textContent += sharedData.a3_link;
+document.getElementById('article link 3').setAttribute("href", sharedData.a3_link);
+document.getElementById('article stance 4').textContent += sharedData.a4_class;
+document.getElementById('article link 4').textContent += sharedData.a4_link;
+document.getElementById('article link 4').setAttribute("href", sharedData.a4_link);

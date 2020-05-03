@@ -1,5 +1,5 @@
 export default async function inference(title, body) {
-    let SERVER_ENDPOINT = 'https://us-central1-inspector-project.cloudfunctions.net/handler';
+    let SERVER_ENDPOINT = 'https://us-central1-inspector-project.cloudfunctions.net/fuck_gcp';
     // var request_body = {'title': 'Coronavirus Live Updates: As Economy Hemorrhages Jobs, Europeans Agree to Prime E.U.’s Pump - The New York Times',
     //                 'body': 'I hate monkeys. I just want cookies.'};
     var request_body = {
