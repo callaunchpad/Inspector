@@ -1,4 +1,70 @@
 {
+    "abcnews.go.com": {
+        "type" : "trusted",
+        "2nd type" : "",
+        "3rd type" : "",
+        "Source Notes (things to know?)" : ""
+    },
+    "bbc.com": {
+        "type" : "trusted",
+        "2nd type" : "",
+        "3rd type" : "",
+        "Source Notes (things to know?)" : ""
+    },
+    "cbsnews.com": {
+        "type" : "trusted",
+        "2nd type" : "",
+        "3rd type" : "",
+        "Source Notes (things to know?)" : ""
+    },
+    "cnn.com": {
+        "type" : "trusted",
+        "2nd type" : "",
+        "3rd type" : "",
+        "Source Notes (things to know?)" : ""
+    },
+    "foxnews.com": {
+        "type" : "trusted",
+        "2nd type" : "",
+        "3rd type" : "",
+        "Source Notes (things to know?)" : ""
+    },
+    "msnbc.com": {
+        "type" : "trusted",
+        "2nd type" : "",
+        "3rd type" : "",
+        "Source Notes (things to know?)" : ""
+    },
+    "nbcnews.com": {
+        "type" : "trusted",
+        "2nd type" : "",
+        "3rd type" : "",
+        "Source Notes (things to know?)" : ""
+    },
+    "npr.org": {
+        "type" : "trusted",
+        "2nd type" : "",
+        "3rd type" : "",
+        "Source Notes (things to know?)" : ""
+    },
+    "nytimes.com": {
+        "type" : "trusted",
+        "2nd type" : "",
+        "3rd type" : "",
+        "Source Notes (things to know?)" : ""
+    },
+    "usnews.com": {
+        "type" : "trusted",
+        "2nd type" : "",
+        "3rd type" : "",
+        "Source Notes (things to know?)" : ""
+    },
+    "washingtonpost.com": {
+        "type" : "trusted",
+        "2nd type" : "",
+        "3rd type" : "",
+        "Source Notes (things to know?)" : ""
+    },
     "100percentfedup.com" : {
       "type" : "bias",
       "2nd type" : "",
