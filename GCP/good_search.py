@@ -3,11 +3,12 @@ from bs4 import BeautifulSoup
 import re
 import urllib.parse
 from urllib.parse import urlparse
-from nlp_tools import make_embeddings_dict, save_file, load_file, remove_punc, remove_stopwords, lemmatize
+from nlp_tools import make_embeddings_dict, save_file, remove_punc, remove_stopwords, lemmatize
 import time
 
 def search(query, emb_dict):
     print("search beginning...")
+    print("search query:", query)
     articles_info = googleSearch(query)
     result = []
     print("article_info length:", len(articles_info))
@@ -20,16 +21,17 @@ def search(query, emb_dict):
     return result
     
 def googleSearch(query):
+    print('googleSearch query:', query)
     url = 'https://www.bing.com/news/search?client=ubuntu&channel=fs&q={}&ie=utf-8&oe=utf-8'.format(query)
+    print('url:', url)
     res = requests.get(url)
-    soup = BeautifulSoup(res.content, features='html.parser')
-    print(soup)
+    soup = BeautifulSoup(res.content, features='lxml')
+    # print("soup printed:", soup)
 
     result = []
     links = []
     
     for link in soup.find_all("a",href=re.compile("(htt.*://.*)")):
-        print(link)
         urls = re.split(":(?=http)",link["href"].replace("/url?q=",""))
         urls = [url.split("&sa=U&ved")[0] for url in urls]
         links.extend(urls)
@@ -89,4 +91,4 @@ def process_url(url):
     return output
 
 # emb_dict = load_file('../models/emb_dict.pkl')
-search('Coronavirus Live Updates: As Economy Hemorrhages Jobs, Europeans Agree to Prime E.U.’s Pump - The New York Times', emb_dict)
+# search('Coronavirus Live Updates: As Economy Hemorrhages Jobs, Europeans Agree to Prime E.U.’s Pump - The New York Times', emb_dict)

@@ -11,28 +11,31 @@ chrome.browserAction.onClicked.addListener(async (tab) => {
     console.log("sending request...")
     // tab param has info about the tab you're on
 
-    // sending message to content.js for it to handle stuff
     chrome.tabs.query({active: true, lastFocusedWindow: true}, async (tabs) => {
-        let dict = {};
-        chrome.tabs.sendMessage(tab.id, dict);
+        // send a message to trigger an alert via content.js
+        chrome.tabs.sendMessage(tab.id);
 
-        console.log("and it got here...")
-        // why do they still use callbacks kill me
         let url = tabs[0].url;
         console.log("url: ", url);
 
         // get webpage information with the Mercury package
         let [webpageInfo, sourceType] = await Promise.all([Mercury.parse(url), checkSources(url)]);
-        
-        // var webpage_info = await Mercury.parse(url);
-
+        if (sourceType != null) {
+            // found the webpage is list of sources
+            if (sourceType === "trusted") {
+                console.log("this is a trusted source!");
+            } else {
+                console.log("this is sketchy source: ", sourceType);
+            }
+            return;
+        }
         // remove html tags with regex
         let articleBody = webpageInfo.content.replace( /(<([^>]+)>)/ig, '');
         let articleTitle = webpageInfo.title;
         console.log("title: ", articleTitle);
         console.log("body: ", articleBody);
 
-        //format results into URL
+        let model_result = await inference(article_title, article_body);
 
         let { cnn_probability, cnn_class, 
             article1_class, article1_link, 
@@ -60,9 +63,9 @@ chrome.browserAction.onClicked.addListener(async (tab) => {
 // trusted/sketch sources. Returns source type as a string if it is,
 // otherwise it returns null.
 async function checkSources(url) {
+    let hostName = getHostName(url);
     let res = await fetch("./sources.json");
     let sources = res.json();
-    let hostName = getHostName(url);
     if (sources[hostName] != null) {
         return sources[hostName].type;
     }
@@ -71,10 +74,10 @@ async function checkSources(url) {
 
 // extracts just the hostname of a url using regex
 function getHostName(url) {
-    var match = url.match(/:\/\/(www[0-9]?\.)?(.[^/:]+)/i);
-    if (match != null && match.length > 2 && typeof match[2] === 'string' && match[2].length > 0) {
-        console.log("hostname: ", match[2]);
-        return match[2];
+    let hostname = url.match(/:\/\/(www[0-9]?\.)?(.[^/:]+)/i);
+    if (hostname != null && hostname.length > 2 && typeof hostname[2] === 'string' && hostname[2].length > 0) {
+        console.log("hostname: ", hostname[2]);
+        return hostname[2];
     }
     else {
         return null;

@@ -11,6 +11,7 @@ import flask
 from flask import jsonify, make_response, Flask, request
 from os import path
 import json
+from good_search import search
 from nlp_tools import remove_punc, remove_stopwords, lemmatize, load_file
 
 #### BILSTM Imports
@@ -19,7 +20,6 @@ from tensorflow.keras.layers import Dropout, LSTM, Bidirectional, Concatenate
 from tensorflow.keras.datasets import imdb
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
-# import good_search
 
 import time
 app = Flask(__name__)
@@ -69,130 +69,30 @@ class CustomModel():
         ##### Create BILSTM
         embedding_size = 50
         num_title_embeddings = 15
-        num_body_embeddings = 40
+        num_body_embeddings = 45
 
-        # Create layers for model
-        input_title = keras.layers.Input(shape = (None, embedding_size))
+        input_title = keras.layers.Input(shape=(None, embedding_size))
 
         # BiLSTM layer that reads in a title input
-        flayer_title = LSTM(60, return_state=True)
-        blayer_title = LSTM(60, return_state=True, go_backwards=True)
+        flayer_title = LSTM(50, return_state=True)
+        blayer_title = LSTM(50, return_state=True, go_backwards=True)
         lstm_title, fh_title, fc_title, bh_title, bc_title = Bidirectional(flayer_title, backward_layer=blayer_title)(input_title)
 
-        input_body = keras.layers.Input(shape = (None, embedding_size))
+        input_body = keras.layers.Input(shape=(None, embedding_size))
 
         # BiLSTM layer that reads in a body input and uses the previous layer's output as initial states
-        flayer_body = LSTM(60, return_state=True)
-        blayer_body = LSTM(60, return_state=True, go_backwards=True)
+        flayer_body = LSTM(50, return_state=True)
+        blayer_body = LSTM(50, return_state=True, go_backwards=True)
         lstm_body, fh_body, fc_body, bh_body, bc_body = Bidirectional(flayer_body, backward_layer=blayer_body)\
             (input_body, initial_state=[fh_title, fc_title, bh_title, bc_title])
 
-        # Dense, Dropout and Dense (out) layers
-        dense1 = Dense(128, activation='relu')(keras.layers.average([fh_body, bh_body]))
-        dropout1 = Dropout(1e-3)(dense1)
-        dense2 = Dense(64, activation='relu')(dropout1)
-        dropout2 = Dropout(1e-3)(dense2)
-        output = Dense(4, activation='softmax')(dropout2)
+        output = Dense(4, activation='softmax')(keras.layers.average([fh_body, bh_body]))
 
         self.lstm = Model(inputs=[input_title, input_body], outputs=[output], name='BiLSTM_Model')
 
         self.lstm.compile(loss=SparseCategoricalCrossentropy(),
-                      optimizer=Adam(learning_rate=1e-3),
-                      metrics=['accuracy'])
-
-import requests
-from bs4 import BeautifulSoup
-import re
-import urllib.parse
-from urllib.parse import urlparse
-from nlp_tools import make_embeddings_dict, save_file, load_file, remove_punc, remove_stopwords, lemmatize
-
-def search(query, emb_dict):
-    print("search beginning...")
-    print("search query:", query)
-    articles_info = googleSearch(query)
-    result = []
-    print("article_info length:", len(articles_info))
-    for text, link in articles_info:
-        text = text[:500]
-        # print(link)
-        # print("text", word_embeddings(text, emb_dict))
-        result.append((word_embeddings(text, emb_dict), link))
-    # print(result)
-    return result
-    
-def googleSearch(query):
-    print('googleSearch query:', query)
-    url = 'https://www.bing.com/news/search?client=ubuntu&channel=fs&q={}&ie=utf-8&oe=utf-8'.format(query)
-    print('url:', url)
-    res = requests.get(url)
-    soup = BeautifulSoup(res.content, features='lxml')
-    print("soup printed:", soup)
-
-    result = []
-    links = []
-    
-    for link in soup.find_all("a",href=re.compile("(htt.*://.*)")):
-        urls = re.split(":(?=http)",link["href"].replace("/url?q=",""))
-        urls = [url.split("&sa=U&ved")[0] for url in urls]
-        links.extend(urls)
-    print("4 links:", links[:4])
-
-    i = 0
-    while len(result) < 4 and i < len(links): #returns first 4 links in the google search
-        print("while loop started...")
-        processed_link = process_url(links[i])
-        if len(processed_link) != 0:
-            result.append((processed_link, links[i]))
-        i += 1
-
-    print("search length:", len(result))
-
-    return result 
-
-def word_embeddings(text, emb_dict):
-    embeddings = []
-    for word in text:
-        # word = word.lower()
-        #print(word)
-        # if the word is OOV, append the unk vector
-        if emb_dict.get(word) is None:
-            embeddings.append(emb_dict.get('unk')) # POTENTIALLY CHANGE WHAT TO APPEND
-        else:
-            embeddings.append(emb_dict.get(word))
-    return embeddings
-
-def process_url(url):
-    res = requests.get(url)
-    html_page = res.content
-    soup = BeautifulSoup(html_page, 'html.parser')
-    text = soup.find_all('p')
-
-    output = ''
-    blacklist = [
-        '[document]',
-        'noscript',
-        'header',
-        'html',
-        'meta',
-        'head', 
-        'input',
-        'script',
-        'footer'
-        # there may be more elements you don't want, such as "style", etc.
-    ]
-    # print("testing")
-    # print(text)
-    for t in text:
-        # print(t)
-        if t.parent.name not in blacklist:
-            output += '{} '.format(t.get_text())
-
-    # print(output)
-    return output
-
-# emb_dict = load_file('../models/emb_dict.pkl')
-# search('Coronavirus Live Updates: As Economy Hemorrhages Jobs, Europeans Agree to Prime E.U.’s Pump - The New York Times', emb_dict)
+                    optimizer=Adam(learning_rate=1e-3),
+                    metrics=['accuracy'])
 
 def download_blob(bucket_name, source_blob_name, destination_file_name):
     """Downloads a blob from the bucket."""
@@ -321,10 +221,8 @@ def fuck_gcp(request):
         print("Article", i, "'s Link:", article[1])
         lstm_predictions.append(lstm_prediction) #For use in returning final JSON
         lstm_links.append(article[1]) #For use in returning final JSON
-    print("lstm ")
     print("lstm prediction time:", time.time() - lstm_pred_time)
 
-    final_result = { 'result': final_cnn_pred }
     json_result = jsonify(cnn_probability=str(cnn_predictions[0][0]),
                           cnn_class=str(np.round(cnn_predictions[0][0])),
                           article1_class=str(stances[np.argmax(lstm_predictions[0][0])]),
@@ -335,9 +233,5 @@ def fuck_gcp(request):
                           article3_link=lstm_links[2],
                           article4_class=str(stances[np.argmax(lstm_predictions[3][0])]),
                           article4_link=lstm_links[3])
-    # print(json_result)
-    # response = make_response(json_result)
-    # print(response)
-    # print(json.dumps(final_result), 200, {'Content-Type': 'application/json'})
     print("total time:", time.time() - global_time)
     return json_result
