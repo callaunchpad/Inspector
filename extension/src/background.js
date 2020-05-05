@@ -38,8 +38,47 @@ chrome.browserAction.onClicked.addListener(async (tab) => {
         console.log("type: ", source_type);
         if (source_type != null) {
             // found the webpage is list of sources
+            let showURL = getHostName(url);
             if (source_type === "trusted") {
                 console.log("this is a trusted source!");
+                chrome.windows.create({url: "trusted.html?data=" + encodeURIComponent(JSON.stringify({siteURL: showURL})), 
+                    type: "popup", height: 200, width: 300});
+            } else if (source_type === "bias") {
+                console.log("this is a biased source!");
+                chrome.windows.create({url: "bias.html?data=" + encodeURIComponent(JSON.stringify({siteURL: showURL})), 
+                    type: "popup", height: 200, width: 300});
+            } else if (source_type === "clickbait") {
+                console.log("this is clickbait!");
+                chrome.windows.create({url: "clickbait.html?data=" + encodeURIComponent(JSON.stringify({siteURL: showURL})), 
+                    type: "popup", height: 200, width: 300});
+            } else if (source_type === "conspiracy") {
+                console.log("this source has conspiracy!");
+                chrome.windows.create({url: "conspiracy.html?data=" + encodeURIComponent(JSON.stringify({siteURL: showURL})), 
+                    type: "popup", height: 200, width: 300});
+            } else if (source_type === "fake") {
+                console.log("this is a fake source!");
+                chrome.windows.create({url: "fake.html?data=" + encodeURIComponent(JSON.stringify({siteURL: showURL})), 
+                    type: "popup", height: 200, width: 300});
+            } else if (source_type === "hate") {
+                console.log("this source has hate!");
+                chrome.windows.create({url: "hate.html?data=" + encodeURIComponent(JSON.stringify({siteURL: showURL})), 
+                    type: "popup", height: 200, width: 300});
+            } else if (source_type === "junksci") {
+                console.log("this is a junksci source!");
+                chrome.windows.create({url: "junksci.html?data=" + encodeURIComponent(JSON.stringify({siteURL: showURL})), 
+                    type: "popup", height: 200, width: 300});
+            } else if (source_type === "political") {
+                console.log("this is a political source!");
+                chrome.windows.create({url: "political.html?data=" + encodeURIComponent(JSON.stringify({siteURL: showURL})), 
+                    type: "popup", height: 200, width: 300});
+            } else if (source_type === "satire") {
+                console.log("this is a satirical source!");
+                chrome.windows.create({url: "satire.html?data=" + encodeURIComponent(JSON.stringify({siteURL: showURL})), 
+                    type: "popup", height: 200, width: 300});
+            } else if (source_type === "unreliable") {
+                console.log("this is a unreliable source!");
+                chrome.windows.create({url: "unreliable.html?data=" + encodeURIComponent(JSON.stringify({siteURL: showURL})), 
+                    type: "popup", height: 200, width: 300});
             } else {
                 console.log("this is sketchy source: ", source_type);
             }
