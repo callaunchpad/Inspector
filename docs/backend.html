@@ -93,7 +93,7 @@
 						<div class="col-md-12 col-md-offset-0">
 							<div class="animate-box">
 								<h2>Backend</h2>
-								<p>fill</p>
+								<p>Applying the models to the article in question</p>
 							</div>
 						</div>
 					</div>
@@ -107,66 +107,71 @@
 					<div class="col-md-4 text-center animate-box">
 						<div class="services">
 							<span class="icon">
-								<i class="icon-browser"></i>
+								<i class="icon-server"></i>
 							</span>
 							<div class="desc">
-								<h3>Create your own template</h3>
-								<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+								<h3>Google Cloud Platform</h3>
+								<p>We used the GCP to upload model weights, deploy our code to run the models, and send the information back to the client. Our main model evaluation code was written in Python and the communication between server and client was written in JavaScript.</p>
 							</div>
 						</div>
 					</div>
 					<div class="col-md-4 text-center animate-box">
 						<div class="services">
 							<span class="icon">
-								<i class="icon-download"></i>
+								<i class="icon-cloud-upload"></i>
 							</span>
 							<div class="desc">
-								<h3>Automatic Backup Data</h3>
-								<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+								<h3>Storing Information in the Cloud</h3>
+								<p>We stored our trained model weights for both the CNN and BiLSTM and the word embedding dictionary in the GCP that could be easily downloaded in the backend. This allowed us to quickly deploy our models and access our word embedding dictionary that normally would have taken a very long time to newly download each time.
+                </p>
 							</div>
 						</div>
 					</div>
 					<div class="col-md-4 text-center animate-box">
 						<div class="services">
 							<span class="icon">
-								<i class="icon-layers"></i>
+								<i class="icon-cog"></i>
 							</span>
 							<div class="desc">
-								<h3>Page Builder</h3>
-								<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+								<h3>CNN Evaluation</h3>
+								<p>Took an article’s title and body as input that was converted to word embeddings. Fed these embeddings into the CNN that output whether the model thought the article was real or fake</p>
 							</div>
 						</div>
-					</div>
-					<div class="col-md-4 text-center animate-box">
-						<div class="services">
-							<span class="icon">
-								<i class="icon-video"></i>
-							</span>
-							<div class="desc">
-								<h3>Watch tutorial</h3>
-								<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-							</div>
-						</div>
-					</div>
+          </div>
+        </div>
+        <div class="row">
 					<div class="col-md-4 text-center animate-box">
 						<div class="services">
 							<span class="icon">
 								<i class="icon-gears"></i>
 							</span>
 							<div class="desc">
-								<h3>Help &amp; Support</h3>
-								<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+								<h3>BiLSTM Evaluation</h3>
+								<p>Using the results of the search, we turned the new bodies into word embeddings and fed the original article’s title embeddings and these new body embeddings into the BiLSTM. The output is the stance that each new article held in relation to the one in question.</p>
 							</div>
 						</div>
 					</div>
 					<div class="col-md-4 text-center animate-box">
 						<div class="services">
 							<span class="icon">
-								<i class="icon-adjustments"></i>
+								<i class="icon-magnifying-glass"></i>
 							</span>
 							<div class="desc">
-								<h3>Lots of features</h3>
-								<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
+								<h3>Internet Search for Related Articles</h3>
+								<p>We ran a search on the internet using the article’s title to find related news stories. We scraped four news links and retrieved the article bodies of each. 
+                </p>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-4 text-center animate-box">
+						<div class="services">
+							<span class="icon">
+								<i class="icon-toolbox"></i>
+							</span>
+							<div class="desc">
+								<h3>JavaScript Handling
+                </h3>
+								<p>Sends a post request to the GCP containing the article information needed for model evaluation. A JSON is sent back containing the CNN probability and class output as well as the four links used in the BiLSTM and each one’s stance output.</p>
 							</div>
 						</div>
 					</div>
