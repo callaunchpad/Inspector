@@ -165,7 +165,7 @@ def nltk_test(inp):
     arr = lemmatize(arr)
     print(arr)
 
-def fuck_gcp(request):
+def handler2(request):
     global_time = time.time()
     print("global time", global_time)
     print("beginning...")

@@ -41,7 +41,7 @@ def googleSearch(query):
     while len(result) < 4 and i < len(links): #returns first 4 links in the google search
         print("while loop started...")
         processed_link = process_url(links[i])
-        if len(processed_link) != 0:
+        if len(processed_link) != 0 and (processed_link, links[i]) not in result:
             result.append((processed_link, links[i]))
         i += 1
 
