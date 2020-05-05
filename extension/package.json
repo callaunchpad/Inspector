@@ -6,6 +6,7 @@
   "dependencies": {
     "@postlight/mercury-parser": "^2.2.0",
     "node-fetch": "^2.6.0",
+    "psl": "^1.8.0",
     "webpack": "^4.42.1"
   },
   "devDependencies": {

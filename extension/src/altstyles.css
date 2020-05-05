@@ -1,0 +1,88 @@
+.box {
+    width: auto;
+    height: auto;
+    border: 3px solid black;
+    margin: 20px auto;
+    background-color: #e6ffff;
+}
+hr {
+    width: 250px;
+    margin-left: auto;
+    margin-right: auto;
+    height: 2px;
+    background-color:#333333; 
+    border: #333333;
+}
+
+h1, h2, h3, p {
+    text-align: center;
+    font-family: Helvetica;
+}
+
+h2 {
+    margin-bottom: auto;
+}
+
+.smaller {
+    font-size: smaller;
+}
+
+h3, p {
+    color: #4d4d4d;
+    margin: 15px;
+}
+
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+    width: 80%;
+    border: 1px solid #3d3d3d;
+}
+
+td, th {
+/* border: 1px solid #dddddd; */
+text-align: center;
+padding: 8px;
+}
+
+th {
+    border-bottom: 1px solid #3d3d3d;
+}
+
+.notfirst:nth-child(even) {
+    background-color: #dbf8ff;
+}
+/* .notfirst:nth-child(odd) {
+    background-color: #e0f9ff;
+} */
+
+.notfirst:hover {background-color: #caf4fa;}
+
+.space {
+    height: .5px;
+}
+.black {
+    color: black;
+}
+
+a:link {
+    color: #0098bd;
+}
+
+/* visited link */
+a:visited {
+color: #00586e;
+}
+
+/* mouse over link */
+a:hover {
+color: #7bdbcb;
+}
+
+/* selected link */
+a:active {
+color: #00586e;
+}
