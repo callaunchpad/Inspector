@@ -3,7 +3,7 @@
 
 pip==20.0.2
 gast==0.2.2
-tensorflow==2.0.0b0
+tensorflow==2.5.3
 google-cloud-storage==1.25.0
 Pillow==6.0.0
 numpy==1.18.1
