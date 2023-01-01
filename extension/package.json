@@ -7,10 +7,10 @@
     "@postlight/mercury-parser": "^2.2.0",
     "node-fetch": "^2.6.0",
     "psl": "^1.8.0",
-    "webpack": "^4.42.1"
+    "webpack": "^5.75.0"
   },
   "devDependencies": {
-    "webpack-cli": "^3.3.11"
+    "webpack-cli": "^5.0.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
